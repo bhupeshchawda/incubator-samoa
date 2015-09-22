@@ -344,6 +344,53 @@ elif [ $PLATFORM = 'FLINK' ]; then
                 $FLINK_EXEC run $DEPLOYABLE $COMPLETE_ARG
         fi                                                    
 
+elif [ $PLATFORM = 'APEX' ]; then
+
+    if [ ! -f $2 ];then
+        echo "$2 does not exist!"
+        echo "Please use a valid jar file for Apex execution"
+        exit -1
+    fi
+
+    VALUE=""
+    getvalue()
+    {
+        VALUE=`sed '/^\#/d' $BASE_DIR/$SAMOA_APEX_PROPERTIES | grep "$1" | tail -n 1 | cut -d "=" -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'`
+    }
+
+    SAMOA_APEX_PROPERTIES="samoa-apex.properties"
+    MODE_OPTION="samoa.apex.mode"
+    DT_DFS_DIR_OPTION="dt.dfsRootDirectory"
+    DT_SITE_OPTION="dt.site.path"
+    DEFAULT_FS_OPTION="fs.defaultFS"
+
+    getvalue "$DT_DFS_DIR_OPTION"
+    DT_DFS_DIR="$VALUE"
+
+    getvalue "$DEFAULT_FS_OPTION"
+    DEFAULT_FS="$VALUE"
+
+    getvalue "$DT_SITE_OPTION"
+    DT_SITE="$VALUE"
+
+    getvalue "$MODE_OPTION"
+    MODE_ARG="$VALUE"
+
+    DEPLOYABLE=$JAR_PATH
+    echo "Deployable: " $DEPLOYABLE
+    if [ "$MODE_ARG" = "cluster" ]; then
+        CMD="java -cp .:$DEPLOYABLE -D$DT_DFS_DIR_OPTION=$DT_DFS_DIR -D$DEFAULT_FS_OPTION=$DEFAULT_FS -D$DT_SITE_OPTION=$DT_SITE org.apache.samoa.apex.ApexDoTask ${OPTIONS}"
+        echo Command: $CMD
+        ${CMD}
+    elif [ "$MODE_ARG" = "local" ]
+    then
+        CMD="java -cp .:$DEPLOYABLE -D$DT_DFS_DIR_OPTION=$DT_DFS_DIR -D$DEFAULT_FS_OPTION=$DEFAULT_FS -D$DT_SITE_OPTION=$DT_SITE org.apache.samoa.apex.LocalApexDoTask ${OPTIONS}"
+        echo Command: $CMD
+        ${CMD}
+    else
+        echo "Wrong mode argument. Check property samoa.apex.mode in samoa-apex.properties file"
+    fi
+
 elif [ $PLATFORM = 'THREADS' ]; then
 	
 	echo "Deploying to LOCAL with MULTITHREADING."
