@@ -76,6 +76,15 @@
             </modules>
         </profile>
         <profile>
+            <id>apex</id>
+            <modules>
+                <module>samoa-instances</module>
+                <module>samoa-api</module>
+                <module>samoa-apex</module>
+                <module>samoa-test</module>
+            </modules>
+        </profile>
+        <profile>
             <id>flink</id>
             <modules>
                 <module>samoa-instances</module>
@@ -101,6 +110,7 @@
                 <module>samoa-local</module>
                 <module>samoa-threads</module>
                 <module>samoa-storm</module>
+                <module>samoa-apex</module>
                 <module>samoa-flink</module>
                 <module>samoa-samza</module>
                 <module>samoa-test</module>
