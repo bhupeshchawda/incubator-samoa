@@ -10,6 +10,7 @@ public class ApexTask implements StreamingApplication{
 	@Override
 	public void populateDAG(DAG dag, Configuration conf) {
 		ApexTopology apexTopo = new ApexTopology(dag, "Test");
+		dag = apexTopo.getDAG();
 	}
 
 }

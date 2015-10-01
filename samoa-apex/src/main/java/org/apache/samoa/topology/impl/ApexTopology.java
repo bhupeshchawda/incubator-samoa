@@ -20,10 +20,10 @@ package org.apache.samoa.topology.impl;
  * #L%
  */
 
-import backtype.storm.topology.TopologyBuilder;
-
 import com.datatorrent.api.DAG;
 import com.datatorrent.api.Operator;
+import com.datatorrent.stram.plan.logical.LogicalPlan;
+
 import org.apache.samoa.topology.IProcessingItem;
 import org.apache.samoa.topology.AbstractTopology;
 
@@ -43,6 +43,7 @@ public class ApexTopology extends AbstractTopology {
 	}
 	protected ApexTopology(String name) {
 		super(name);
+		dag = new LogicalPlan();
 	}
 
 	@Override

@@ -20,9 +20,6 @@ package org.apache.samoa.topology.impl;
  * #L%
  */
 
-import backtype.storm.task.OutputCollector;
-import backtype.storm.tuple.Values;
-
 import com.datatorrent.api.DefaultOutputPort;
 import org.apache.samoa.core.ContentEvent;
 

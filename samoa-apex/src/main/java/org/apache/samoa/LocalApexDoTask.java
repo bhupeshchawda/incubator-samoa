@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.datatorrent.api.DAG;
 import com.datatorrent.api.LocalMode;
+
 import org.apache.samoa.topology.impl.ApexTask;
 import org.apache.samoa.topology.impl.ApexTopology;
 
@@ -46,28 +47,21 @@ public class LocalApexDoTask {
 	 */
 	public static void main(String[] args) {
 
-		LocalMode lma = LocalMode.newInstance();
-		Configuration conf = new Configuration(false);
-
+	    LocalMode lma = LocalMode.newInstance();
+	    Configuration conf = new Configuration(false);
+	    
 	    conf.set("com.datatorrent.apex.testParam","true");
 
 	    try {
 			lma.prepareDAG(new ApexTask(), conf);
-			
 		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	    
-	    DAG dag = lma.getDAG();
-	    ApexTopology topo = new ApexTopology(dag, "Dag");
-	    
-	    
-	    
-	    // Now validate dag and continue
 	    LocalMode.Controller lc = lma.getController();
 	    lc.setHeartbeatMonitoringEnabled(false);
 
 	    lc.runAsync();
-
+	    lc.shutdown();
 	}
 }
