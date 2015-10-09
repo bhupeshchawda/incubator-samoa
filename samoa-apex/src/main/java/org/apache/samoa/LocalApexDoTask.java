@@ -19,15 +19,24 @@ package org.apache.samoa;
  * limitations under the License.
  * #L%
  */
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import backtype.storm.Config;
+
 import com.datatorrent.api.DAG;
 import com.datatorrent.api.LocalMode;
 
+import org.apache.samoa.topology.impl.ApexSamoaUtils;
 import org.apache.samoa.topology.impl.ApexTask;
 import org.apache.samoa.topology.impl.ApexTopology;
+import org.apache.samoa.topology.impl.StormSamoaUtils;
+import org.apache.samoa.topology.impl.StormTopology;
 
 /**
  * The main class to execute a SAMOA task in LOCAL mode in Storm.
@@ -47,13 +56,24 @@ public class LocalApexDoTask {
 	 */
 	public static void main(String[] args) {
 
+	    List<String> tmpArgs = new ArrayList<String>(Arrays.asList(args));
+
+	    int numWorker = ApexSamoaUtils.numWorkers(tmpArgs);
+
+	    args = tmpArgs.toArray(new String[0]);
+
+	    // convert the arguments into Storm topology
+	    ApexTopology apexTopo = ApexSamoaUtils.argsToTopology(args);
+	    String topologyName = apexTopo.getTopologyName();
+
 	    LocalMode lma = LocalMode.newInstance();
 	    Configuration conf = new Configuration(false);
 	    
 	    conf.set("com.datatorrent.apex.testParam","true");
 
 	    try {
-			lma.prepareDAG(new ApexTask(), conf);
+			lma.prepareDAG(new ApexTask(apexTopo), conf);
+			System.out.println("Dag Set in lma: " + lma.getDAG());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
