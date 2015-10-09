@@ -28,7 +28,7 @@ import com.datatorrent.api.Operator;
  * @author Arinto Murdopo
  * 
  */
-interface ApexTopologyNode extends Operator {
+interface ApexTopologyNode {
 
   void addToTopology(ApexTopology topology, int parallelismHint);
 

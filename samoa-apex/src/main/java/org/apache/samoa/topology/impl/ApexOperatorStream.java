@@ -29,7 +29,7 @@ import org.apache.samoa.core.ContentEvent;
  * @author Arinto Murdopo
  * 
  */
-class ApexBoltStream extends ApexStream {
+class ApexOperatorStream extends ApexStream {
 
   /**
 	 * 
@@ -38,7 +38,7 @@ class ApexBoltStream extends ApexStream {
 
   private DefaultOutputPort<ContentEvent> outputCollector;
 
-  ApexBoltStream(String stormComponentId) {
+  ApexOperatorStream(String stormComponentId) {
     super(stormComponentId);
   }
 

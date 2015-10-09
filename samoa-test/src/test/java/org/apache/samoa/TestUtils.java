@@ -67,6 +67,7 @@ public class TestUtils {
                   testParams.getInputDelayMicroSec()
                   ).split("[ ]"));
         } catch (Exception e) {
+        	e.printStackTrace();
           LOG.error("Cannot execute test {} {}", e.getMessage(), e.getCause().getMessage());
         }
         return null;

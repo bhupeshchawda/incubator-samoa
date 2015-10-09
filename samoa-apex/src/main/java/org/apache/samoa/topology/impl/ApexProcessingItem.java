@@ -27,8 +27,10 @@ import java.util.UUID;
 
 import com.datatorrent.api.Context.OperatorContext;
 import com.datatorrent.api.DAG;
+import com.datatorrent.api.DefaultOutputPort;
 import com.datatorrent.api.Operator;
 import com.datatorrent.common.util.BaseOperator;
+
 import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.core.Processor;
 import org.apache.samoa.topology.AbstractProcessingItem;
@@ -53,7 +55,7 @@ import backtype.storm.tuple.Tuple;
  * 
  */
 class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyNode {
-	private final ProcessingItemBolt piBolt;
+	private final ProcessingItemOperator piOperator;
 
 	// TODO: should we put parallelism hint here?
 	// imo, parallelism hint only declared when we add this PI in the topology
@@ -65,7 +67,7 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 
 	ApexProcessingItem(Processor processor, String friendlyId, int parallelismHint) {
 		super(processor, parallelismHint);
-		this.piBolt = new ProcessingItemBolt(processor);
+		this.piOperator = new ProcessingItemOperator(processor);
 		this.setName(friendlyId);
 	}
 
@@ -79,13 +81,13 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 	@Override
 	public void addToTopology(ApexTopology topology, int parallelismHint) {
 		DAG dag = topology.getDAG();
-		dag.addOperator(this.getName(), this.piBolt);
+		dag.addOperator(this.getName(), this.piOperator);
 		// add num partitions
 	}
 
 	@Override
 	public ApexStream createStream() {
-		return piBolt.createStream(this.getName());
+		return piOperator.createStream(this.getName());
 	}
 
 	@Override
@@ -100,49 +102,24 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 		return sb.toString();
 	}
 
-	private final static class ProcessingItemBolt extends BaseOperator {
+	private final static class ProcessingItemOperator extends BaseOperator {
 
 		private static final long serialVersionUID = -6637673741263199198L;
 
-		private final Set<ApexBoltStream> streams;
+		private final Set<ApexOperatorStream> streams;
 		private final Processor processor;
 
-		private OutputCollector collector;
+		private DefaultOutputPort<ContentEvent> collector;
 
-		ProcessingItemBolt(Processor processor) {
-			this.streams = new HashSet<ApexBoltStream>();
+		ProcessingItemOperator(Processor processor) {
+			this.streams = new HashSet<ApexOperatorStream>();
 			this.processor = processor;
 		}
 
-
 		ApexStream createStream(String piId) {
-			ApexBoltStream stream = new ApexBoltStream(piId);
+			ApexOperatorStream stream = new ApexOperatorStream(piId);
 			streams.add(stream);
 			return stream;
 		}
-	}
-
-	@Override
-	public void beginWindow(long arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void endWindow() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setup(OperatorContext arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void teardown() {
-		// TODO Auto-generated method stub
-
 	}
 }

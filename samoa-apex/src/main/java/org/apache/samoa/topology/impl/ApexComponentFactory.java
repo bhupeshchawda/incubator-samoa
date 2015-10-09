@@ -49,6 +49,11 @@ public final class ApexComponentFactory implements ComponentFactory {
   }
 
   @Override
+  public ProcessingItem createPi(Processor processor, int parallelism) {
+    return new ApexProcessingItem(processor, this.getComponentName(processor.getClass()), parallelism);
+  }
+
+  @Override
   public EntranceProcessingItem createEntrancePi(EntranceProcessor processor) {
     return new ApexEntranceProcessingItem(processor, this.getComponentName(processor.getClass()));
   }
@@ -81,10 +86,5 @@ public final class ApexComponentFactory implements ComponentFactory {
     componentName.append(index);
 
     return componentName.toString();
-  }
-
-  @Override
-  public ProcessingItem createPi(Processor processor, int parallelism) {
-    return new ApexProcessingItem(processor, this.getComponentName(processor.getClass()), parallelism);
   }
 }

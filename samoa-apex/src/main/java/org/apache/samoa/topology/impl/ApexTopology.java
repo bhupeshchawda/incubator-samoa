@@ -26,6 +26,7 @@ import com.datatorrent.stram.plan.logical.LogicalPlan;
 
 import org.apache.samoa.topology.IProcessingItem;
 import org.apache.samoa.topology.AbstractTopology;
+import org.apache.samoa.topology.Stream;
 
 /**
  * Adaptation of SAMOA topology in samoa-storm
@@ -48,9 +49,10 @@ public class ApexTopology extends AbstractTopology {
 
 	@Override
 	public void addProcessingItem(IProcessingItem procItem, int parallelismHint) {
-		Operator apexNode = dag.addOperator(procItem.toString(), (Operator) procItem);
-		//set num partitions
-		super.addProcessingItem(procItem, parallelismHint);
+
+	    ApexTopologyNode apexNode = (ApexTopologyNode) procItem;
+	    apexNode.addToTopology(this, parallelismHint);
+	    super.addProcessingItem(procItem, parallelismHint);
 	}
 
 	public DAG getDAG() {

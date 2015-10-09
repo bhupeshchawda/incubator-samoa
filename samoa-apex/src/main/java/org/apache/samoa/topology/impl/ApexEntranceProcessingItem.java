@@ -45,7 +45,7 @@ import org.apache.samoa.topology.Stream;
  * EntranceProcessingItem implementation for Storm.
  */
 class ApexEntranceProcessingItem extends AbstractEntranceProcessingItem implements ApexTopologyNode {
-	private final ApexEntranceSpout piSpout;
+	private final ApexEntranceOperator piOperator;
 
 	ApexEntranceProcessingItem(EntranceProcessor processor) {
 		this(processor, UUID.randomUUID().toString());
@@ -54,29 +54,29 @@ class ApexEntranceProcessingItem extends AbstractEntranceProcessingItem implemen
 	ApexEntranceProcessingItem(EntranceProcessor processor, String friendlyId) {
 		super(processor);
 		this.setName(friendlyId);
-		this.piSpout = new ApexEntranceSpout(processor);
+		this.piOperator = new ApexEntranceOperator(processor);
 	}
 
 	@Override
 	public EntranceProcessingItem setOutputStream(Stream stream) {
-		piSpout.setOutputStream((ApexStream) stream);
+		piOperator.setOutputStream((ApexStream) stream);
 		return this;
 	}
 
 	@Override
 	public Stream getOutputStream() {
-		return piSpout.getOutputStream();
+		return piOperator.getOutputStream();
 	}
 
 	@Override
 	public void addToTopology(ApexTopology topology, int parallelismHint) {
-		topology.getDAG().addOperator(this.getName(), piSpout);
+		topology.getDAG().addOperator(this.getName(), piOperator);
 		//add num partitions
 	}
 
 	@Override
 	public ApexStream createStream() {
-		return piSpout.createStream(this.getName());
+		return piOperator.createStream(this.getName());
 	}
 
 	@Override
@@ -94,15 +94,15 @@ class ApexEntranceProcessingItem extends AbstractEntranceProcessingItem implemen
 	/**
 	 * Resulting Spout of StormEntranceProcessingItem
 	 */
-	final static class ApexEntranceSpout implements InputOperator {
+	final static class ApexEntranceOperator implements InputOperator {
 
 		// private final Set<StormSpoutStream> streams;
 		private final EntranceProcessor entranceProcessor;
 		private ApexStream outputStream;
 
-		private DefaultOutputPort collector = new DefaultOutputPort();
+		private DefaultOutputPort<ContentEvent> collector = new DefaultOutputPort<ContentEvent>();
 
-		ApexEntranceSpout(EntranceProcessor processor) {
+		ApexEntranceOperator(EntranceProcessor processor) {
 			this.entranceProcessor = processor;
 		}
 
@@ -115,7 +115,7 @@ class ApexEntranceProcessingItem extends AbstractEntranceProcessingItem implemen
 		}
 
 		ApexStream createStream(String piId) {
-			ApexStream stream = new ApexBoltStream(piId);
+			ApexStream stream = new ApexOperatorStream(piId);
 			return stream;
 		}
 
@@ -141,31 +141,9 @@ class ApexEntranceProcessingItem extends AbstractEntranceProcessingItem implemen
 
 		@Override
 		public void emitTuples() {
-
+			if(entranceProcessor.hasNext()){
+				collector.emit(entranceProcessor.nextEvent());
+			}
 		}    
-	}
-
-	@Override
-	public void beginWindow(long arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void endWindow() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setup(OperatorContext arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void teardown() {
-		// TODO Auto-generated method stub
-		
 	}
 }
