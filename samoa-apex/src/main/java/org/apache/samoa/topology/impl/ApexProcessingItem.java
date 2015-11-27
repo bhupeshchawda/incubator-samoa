@@ -20,6 +20,7 @@ package org.apache.samoa.topology.impl;
  * #L%
  */
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +30,8 @@ import com.datatorrent.api.Context.OperatorContext;
 import com.datatorrent.api.DAG;
 import com.datatorrent.api.DefaultOutputPort;
 import com.datatorrent.api.Operator;
+import com.datatorrent.api.Operator.InputPort;
+import com.datatorrent.api.Operator.OutputPort;
 import com.datatorrent.common.util.BaseOperator;
 
 import org.apache.samoa.core.ContentEvent;
@@ -70,7 +73,7 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 		this.piOperator = new ProcessingItemOperator(processor);
 		this.setName(friendlyId);
 	}
-
+	
 	@Override
 	protected ProcessingItem addInputStream(Stream inputStream, PartitioningScheme scheme) {
 		ApexStream apexStream = (ApexStream) inputStream;

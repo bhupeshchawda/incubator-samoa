@@ -25,6 +25,9 @@ import java.util.UUID;
 import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.topology.Stream;
 
+import com.datatorrent.api.Operator.InputPort;
+import com.datatorrent.api.Operator.OutputPort;
+
 /**
  * Abstract class to implement Storm Stream
  * 
@@ -36,7 +39,7 @@ abstract class ApexStream implements Stream, java.io.Serializable {
   /**
 	 * 
 	 */
-  private static final long serialVersionUID = 281835563756514852L;
+  private static final long serialVersionUID = 281835563756514852L;  
   protected final String outputStreamId;
   protected final InputStreamId inputStreamId;
 

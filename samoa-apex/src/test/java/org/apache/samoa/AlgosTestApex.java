@@ -27,7 +27,7 @@ import org.junit.Test;
 
 public class AlgosTestApex {
 
-  @Test(timeout = 60000)
+  @Test(timeout = 600000)
   public void testVHTWithStorm() throws Exception {
 
     TestParams vhtConfig = new TestParams.Builder()

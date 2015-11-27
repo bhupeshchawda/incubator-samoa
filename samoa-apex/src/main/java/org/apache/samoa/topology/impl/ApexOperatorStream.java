@@ -38,8 +38,8 @@ class ApexOperatorStream extends ApexStream {
 
   private DefaultOutputPort<ContentEvent> outputCollector;
 
-  ApexOperatorStream(String stormComponentId) {
-    super(stormComponentId);
+  ApexOperatorStream(String apexComponentId) {
+    super(apexComponentId);
   }
 
   @Override
@@ -47,15 +47,15 @@ class ApexOperatorStream extends ApexStream {
     outputCollector.emit(contentEvent);
   }
 
-  // @Override
-  // public void setStreamId(String streamId) {
-  // // TODO Auto-generated method stub
-  // //this.outputStreamId = streamId;
-  // }
+//   @Override
+//   public void setStreamId(String streamId) {
+//   // TODO Auto-generated method stub
+//	   this.outputStreamId = streamId;
+//   }
 
   @Override
   public String getStreamId() {
     // TODO Auto-generated method stub
-    return null;
+	  return null;
   }
 }
