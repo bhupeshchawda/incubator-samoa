@@ -24,6 +24,7 @@ import com.datatorrent.api.DAG;
 import com.datatorrent.api.Operator;
 import com.datatorrent.stram.plan.logical.LogicalPlan;
 
+import org.apache.samoa.topology.EntranceProcessingItem;
 import org.apache.samoa.topology.IProcessingItem;
 import org.apache.samoa.topology.AbstractTopology;
 import org.apache.samoa.topology.Stream;
@@ -46,15 +47,32 @@ public class ApexTopology extends AbstractTopology {
 		super(name);
 		dag = new LogicalPlan();
 	}
+	
+	@Override
+	public void addEntranceProcessingItem(EntranceProcessingItem epi) {
+	    ApexTopologyNode apexNode = (ApexTopologyNode) epi;
+	    apexNode.addToTopology(this, 1);
+	}
+	
+	@Override
+	public void addProcessingItem(IProcessingItem procItem) {
+		addProcessingItem(procItem, 1);
+	}
 
 	@Override
 	public void addProcessingItem(IProcessingItem procItem, int parallelismHint) {
-
 	    ApexTopologyNode apexNode = (ApexTopologyNode) procItem;
 	    apexNode.addToTopology(this, parallelismHint);
 	    super.addProcessingItem(procItem, parallelismHint);
 	}
 
+	@Override
+	public void addStream(Stream stream) {
+		ApexStream apexStream = (ApexStream) stream;
+//		dag.addStream(apexStream.getStreamId(), apexStream.outputPort, apexStream.inputPort);
+		super.addStream(stream);
+	}
+	
 	public DAG getDAG() {
 		return dag;
 	}

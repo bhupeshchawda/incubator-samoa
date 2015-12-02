@@ -61,7 +61,8 @@ public final class ApexComponentFactory implements ComponentFactory {
   @Override
   public Stream createStream(IProcessingItem sourcePi) {
     ApexTopologyNode apexCompatiblePi = (ApexTopologyNode) sourcePi;
-    return apexCompatiblePi.createStream();
+    ApexStream stream = apexCompatiblePi.createStream();
+    return stream;
   }
 
   @Override

@@ -20,36 +20,20 @@ package org.apache.samoa.topology.impl;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
-import com.datatorrent.api.Context.OperatorContext;
 import com.datatorrent.api.DAG;
+import com.datatorrent.api.DefaultInputPort;
 import com.datatorrent.api.DefaultOutputPort;
-import com.datatorrent.api.Operator;
-import com.datatorrent.api.Operator.InputPort;
-import com.datatorrent.api.Operator.OutputPort;
 import com.datatorrent.common.util.BaseOperator;
+import com.datatorrent.stram.plan.logical.LogicalPlan.StreamMeta;
 
 import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.core.Processor;
 import org.apache.samoa.topology.AbstractProcessingItem;
 import org.apache.samoa.topology.ProcessingItem;
 import org.apache.samoa.topology.Stream;
-import org.apache.samoa.topology.impl.ApexStream.InputStreamId;
 import org.apache.samoa.utils.PartitioningScheme;
-
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.BoltDeclarer;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
 
 /**
  * ProcessingItem implementation for Storm.
@@ -58,39 +42,56 @@ import backtype.storm.tuple.Tuple;
  * 
  */
 class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyNode {
-	private final ProcessingItemOperator piOperator;
-
+	private final ApexOperator operator;
+	private DAG dag;
+	
 	// TODO: should we put parallelism hint here?
 	// imo, parallelism hint only declared when we add this PI in the topology
 	// open for dicussion :p
 
+	// Constructor
 	ApexProcessingItem(Processor processor, int parallelismHint) {
 		this(processor, UUID.randomUUID().toString(), parallelismHint);
 	}
 
+	// Constructor
 	ApexProcessingItem(Processor processor, String friendlyId, int parallelismHint) {
 		super(processor, parallelismHint);
-		this.piOperator = new ProcessingItemOperator(processor);
+		this.operator = new ApexOperator(processor, parallelismHint);
 		this.setName(friendlyId);
 	}
 	
 	@Override
 	protected ProcessingItem addInputStream(Stream inputStream, PartitioningScheme scheme) {
 		ApexStream apexStream = (ApexStream) inputStream;
-		InputStreamId inputId = apexStream.getInputId();
+		
+		// Setup stream codecs here
+		switch(scheme) {
+		case SHUFFLE:
+			break;
+		case BROADCAST:
+			break;
+		case GROUP_BY_KEY:
+			break;
+		default:
+			// Should never occur
+		}
+		this.operator.addInputStream(apexStream);
+		dag.addStream(apexStream.getStreamId(), apexStream.outputPort, apexStream.inputPort);
 		return this;
 	}
 
 	@Override
 	public void addToTopology(ApexTopology topology, int parallelismHint) {
 		DAG dag = topology.getDAG();
-		dag.addOperator(this.getName(), this.piOperator);
-		// add num partitions
+		this.dag = dag;
+		this.operator.instances = parallelismHint;
+		dag.addOperator(this.getName(), this.operator);
 	}
 
 	@Override
 	public ApexStream createStream() {
-		return piOperator.createStream(this.getName());
+		return operator.createStream(this.getName());
 	}
 
 	@Override
@@ -105,24 +106,44 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 		return sb.toString();
 	}
 
-	private final static class ProcessingItemOperator extends BaseOperator {
+	private final static class ApexOperator extends BaseOperator {
 
 		private static final long serialVersionUID = -6637673741263199198L;
-
-		private final Set<ApexOperatorStream> streams;
 		private final Processor processor;
+		private int instances = 1; // Default
+		
+		private DefaultInputPort<ContentEvent> inputPort = new DefaultInputPort<ContentEvent>() {
+			@Override
+			public void process(ContentEvent tuple) {
+				processor.process(tuple);
+			}
+		};
+		
+		private DefaultOutputPort<ContentEvent> outputPort = new DefaultOutputPort<ContentEvent>();
 
-		private DefaultOutputPort<ContentEvent> collector;
-
-		ProcessingItemOperator(Processor processor) {
-			this.streams = new HashSet<ApexOperatorStream>();
+		public DefaultInputPort<ContentEvent> getInputPort() {
+			DefaultInputPort<ContentEvent> port = new DefaultInputPort<ContentEvent>() {
+				@Override
+				public void process(ContentEvent tuple) {
+					processor.process(tuple);
+				}
+			};
+			return port;
+		}
+		
+		ApexOperator(Processor processor, int parallelismHint) {
 			this.processor = processor;
+			this.instances = parallelismHint;
+		}
+		
+		public ApexStream createStream(String id) {
+			ApexStream stream = new ApexStream(id);
+			stream.outputPort = outputPort;
+			return stream;
 		}
 
-		ApexStream createStream(String piId) {
-			ApexOperatorStream stream = new ApexOperatorStream(piId);
-			streams.add(stream);
-			return stream;
+		public void addInputStream(ApexStream stream) {
+			stream.inputPort = inputPort;
 		}
 	}
 }

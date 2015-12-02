@@ -22,68 +22,41 @@ package org.apache.samoa.topology.impl;
 
 import java.util.UUID;
 
+import com.datatorrent.api.DefaultInputPort;
+import com.datatorrent.api.DefaultOutputPort;
+import com.datatorrent.stram.plan.physical.StreamMapping;
+
 import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.topology.Stream;
 
-import com.datatorrent.api.Operator.InputPort;
-import com.datatorrent.api.Operator.OutputPort;
-
 /**
- * Abstract class to implement Storm Stream
+ * Storm Stream that connects into Bolt. It wraps Storm's outputCollector class
  * 
  * @author Arinto Murdopo
  * 
  */
-abstract class ApexStream implements Stream, java.io.Serializable {
+class ApexStream implements Stream, java.io.Serializable {
 
-  /**
-	 * 
-	 */
-  private static final long serialVersionUID = 281835563756514852L;  
-  protected final String outputStreamId;
-  protected final InputStreamId inputStreamId;
+	private static final long serialVersionUID = -5712513402991550847L;
 
-  public ApexStream(String stormComponentId) {
-    this.outputStreamId = UUID.randomUUID().toString();
-    this.inputStreamId = new InputStreamId(stormComponentId, this.outputStreamId);
-  }
+	private String streamId = "";
+	public transient DefaultInputPort<ContentEvent> inputPort = null;
+	public transient DefaultOutputPort<ContentEvent> outputPort = null;
 
-  @Override
-  public abstract void put(ContentEvent contentEvent);
+	public ApexStream(String id) {
+		streamId = UUID.randomUUID()+"";
+	}
+	
+	@Override
+	public void put(ContentEvent contentEvent) {
+		outputPort.emit(contentEvent);
+	}
 
-  String getOutputId() {
-    return this.outputStreamId;
-  }
+	@Override
+	public String getStreamId() {
+		return streamId;
+	}
 
-  InputStreamId getInputId() {
-    return this.inputStreamId;
-  }
-
-  final static class InputStreamId implements java.io.Serializable {
-
-    /**
-		 * 
-		 */
-    private static final long serialVersionUID = -7457995634133691295L;
-    private final String componentId;
-    private final String streamId;
-
-    InputStreamId(String componentId, String streamId) {
-      this.componentId = componentId;
-      this.streamId = streamId;
-    }
-
-    String getComponentId() {
-      return componentId;
-    }
-
-    String getStreamId() {
-      return streamId;
-    }
-  }
-
-  @Override
-  public void setBatchSize(int batchSize) {
-    // Ignore batch size
-  }
+	@Override
+	public void setBatchSize(int batchsize) {}
 }
