@@ -20,14 +20,20 @@ package org.apache.samoa.topology.impl;
  * #L%
  */
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.datatorrent.api.DAG;
 import com.datatorrent.api.DefaultInputPort;
 import com.datatorrent.api.DefaultOutputPort;
+import com.datatorrent.api.annotation.InputPortFieldAnnotation;
+import com.datatorrent.api.annotation.OutputPortFieldAnnotation;
 import com.datatorrent.common.util.BaseOperator;
 import com.datatorrent.stram.plan.logical.LogicalPlan.StreamMeta;
+import com.google.common.collect.Lists;
 
+import org.apache.hadoop.classification.InterfaceAudience.Public;
 import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.core.Processor;
 import org.apache.samoa.topology.AbstractProcessingItem;
@@ -112,25 +118,38 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 		private final Processor processor;
 		private int instances = 1; // Default
 		
-		private DefaultInputPort<ContentEvent> inputPort = new DefaultInputPort<ContentEvent>() {
+		public boolean[] usedInputPorts = new boolean[]{false, false, false};
+		public boolean[] usedOutputPorts = new boolean[]{false, false, false};
+
+		@InputPortFieldAnnotation(optional=true)
+		public transient DefaultInputPort<ContentEvent> inputPort0 = new DefaultInputPort<ContentEvent>() {
 			@Override
 			public void process(ContentEvent tuple) {
 				processor.process(tuple);
 			}
 		};
-		
-		private DefaultOutputPort<ContentEvent> outputPort = new DefaultOutputPort<ContentEvent>();
+		@InputPortFieldAnnotation(optional=true)
+		public transient DefaultInputPort<ContentEvent> inputPort1 = new DefaultInputPort<ContentEvent>() {
+			@Override
+			public void process(ContentEvent tuple) {
+				processor.process(tuple);
+			}
+		};
+		@InputPortFieldAnnotation(optional=true)
+		public transient DefaultInputPort<ContentEvent> inputPort2 = new DefaultInputPort<ContentEvent>() {
+			@Override
+			public void process(ContentEvent tuple) {
+				processor.process(tuple);
+			}
+		};
 
-		public DefaultInputPort<ContentEvent> getInputPort() {
-			DefaultInputPort<ContentEvent> port = new DefaultInputPort<ContentEvent>() {
-				@Override
-				public void process(ContentEvent tuple) {
-					processor.process(tuple);
-				}
-			};
-			return port;
-		}
-		
+		@OutputPortFieldAnnotation(optional=true)
+		public transient DefaultOutputPort<ContentEvent> outputPort0 = new DefaultOutputPort<ContentEvent>();
+		@OutputPortFieldAnnotation(optional=true)
+		public transient DefaultOutputPort<ContentEvent> outputPort1 = new DefaultOutputPort<ContentEvent>();
+		@OutputPortFieldAnnotation(optional=true)
+		public transient DefaultOutputPort<ContentEvent> outputPort2 = new DefaultOutputPort<ContentEvent>();
+
 		ApexOperator(Processor processor, int parallelismHint) {
 			this.processor = processor;
 			this.instances = parallelismHint;
@@ -138,12 +157,40 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 		
 		public ApexStream createStream(String id) {
 			ApexStream stream = new ApexStream(id);
-			stream.outputPort = outputPort;
+			if(!usedOutputPorts[0]) {
+				stream.outputPort = outputPort0;
+				usedOutputPorts[0] = true;
+			}
+			else if(!usedOutputPorts[1]) {
+				stream.outputPort = outputPort1;
+				usedOutputPorts[1] = true;
+			}
+			else if(!usedOutputPorts[2]) {
+				stream.outputPort = outputPort2;
+				usedOutputPorts[2] = true;
+			}
+			else {
+				throw new RuntimeException("Need more input ports for ApexOperator");
+			}
 			return stream;
 		}
 
 		public void addInputStream(ApexStream stream) {
-			stream.inputPort = inputPort;
+			if(!usedInputPorts[0]) {
+				stream.inputPort = inputPort0;
+				usedInputPorts[0] = true;
+			}
+			else if(!usedInputPorts[1]) {
+				stream.inputPort = inputPort1;
+				usedInputPorts[1] = true;
+			}
+			else if(!usedInputPorts[2]) {
+				stream.inputPort = inputPort2;
+				usedInputPorts[2] = true;
+			}
+			else {
+				throw new RuntimeException("Need more input ports for ApexOperator");
+			}
 		}
 	}
 }
