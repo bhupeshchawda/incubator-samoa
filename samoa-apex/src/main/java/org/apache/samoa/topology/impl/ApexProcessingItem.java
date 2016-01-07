@@ -121,6 +121,11 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 		public boolean[] usedInputPorts = new boolean[]{false, false, false};
 		public boolean[] usedOutputPorts = new boolean[]{false, false, false};
 
+		public ApexOperator()
+    {
+		  processor = null;
+    }
+
 		@InputPortFieldAnnotation(optional=true)
 		public transient DefaultInputPort<ContentEvent> inputPort0 = new DefaultInputPort<ContentEvent>() {
 			@Override

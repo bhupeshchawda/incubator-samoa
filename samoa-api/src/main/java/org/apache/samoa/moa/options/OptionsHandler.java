@@ -42,6 +42,10 @@ public class OptionsHandler extends JavaCLIParser {
 
   // public Object handler;
 
+  public OptionsHandler()
+  {
+    super(null, null);
+  }
   public OptionsHandler(Object c, String cliString) {
     super(c, cliString);
     // this.handler = c;

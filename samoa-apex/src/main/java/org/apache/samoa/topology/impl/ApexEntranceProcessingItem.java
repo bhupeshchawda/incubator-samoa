@@ -89,6 +89,12 @@ class ApexEntranceProcessingItem extends AbstractEntranceProcessingItem implemen
 		private ApexStream outputStream = null;
 		private transient final DefaultOutputPort<ContentEvent> outputPort = new DefaultOutputPort<ContentEvent>();
 
+		public ApexInputOperator()
+		{
+		  stream = null;
+		  entranceProcessor = null;
+		}
+
 		ApexInputOperator(EntranceProcessor processor) {
 			this.entranceProcessor = processor;
 			stream = null;

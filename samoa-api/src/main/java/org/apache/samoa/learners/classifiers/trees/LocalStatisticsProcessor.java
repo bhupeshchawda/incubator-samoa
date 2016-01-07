@@ -66,6 +66,13 @@ final class LocalStatisticsProcessor implements Processor {
   private final AttributeClassObserver nominalClassObserver;
   private final AttributeClassObserver numericClassObserver;
 
+  public LocalStatisticsProcessor()
+  {
+    splitCriterion = null;
+    binarySplit = false;
+    nominalClassObserver = null;
+    numericClassObserver = null;
+  }
   // the two observer classes below are also needed to be setup from the Tree
   private LocalStatisticsProcessor(Builder builder) {
     this.splitCriterion = builder.splitCriterion;
