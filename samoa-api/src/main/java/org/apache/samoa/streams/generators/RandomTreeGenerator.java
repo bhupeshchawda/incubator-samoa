@@ -36,6 +36,8 @@ import org.apache.samoa.moa.options.AbstractOptionHandler;
 import org.apache.samoa.moa.tasks.TaskMonitor;
 import org.apache.samoa.streams.InstanceStream;
 
+import com.esotericsoftware.kryo.DefaultSerializer;
+import com.esotericsoftware.kryo.serializers.JavaSerializer;
 import com.github.javacliparser.FloatOption;
 import com.github.javacliparser.IntOption;
 

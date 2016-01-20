@@ -27,16 +27,12 @@ import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.Config;
-
-import com.datatorrent.api.DAG;
 import com.datatorrent.api.LocalMode;
+import com.datatorrent.stram.plan.logical.LogicalPlan;
 
 import org.apache.samoa.topology.impl.ApexSamoaUtils;
 import org.apache.samoa.topology.impl.ApexTask;
 import org.apache.samoa.topology.impl.ApexTopology;
-import org.apache.samoa.topology.impl.StormSamoaUtils;
-import org.apache.samoa.topology.impl.StormTopology;
 
 /**
  * The main class to execute a SAMOA task in LOCAL mode in Storm.
@@ -68,12 +64,11 @@ public class LocalApexDoTask {
 
 	    LocalMode lma = LocalMode.newInstance();
 	    Configuration conf = new Configuration(false);
-	    
-	    conf.set("com.datatorrent.apex.testParam","true");
 
 	    try {
 			lma.prepareDAG(new ApexTask(apexTopo), conf);
 			System.out.println("Dag Set in lma: " + lma.getDAG());
+			((LogicalPlan)lma.getDAG()).validate();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -82,6 +77,11 @@ public class LocalApexDoTask {
 	    lc.setHeartbeatMonitoringEnabled(false);
 
 	    lc.runAsync();
+	    try {
+        Thread.sleep(100000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
 	    lc.shutdown();
 	}
 }

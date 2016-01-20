@@ -5,11 +5,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.storm.guava.collect.Lists;
-import org.apache.storm.guava.collect.Sets;
 
-import com.datatorrent.api.Context.OperatorContext;
+
 import com.datatorrent.api.DAG;
+import com.datatorrent.api.DefaultInputPort;
+import com.datatorrent.api.DefaultOutputPort;
 import com.datatorrent.api.InputOperator;
 import com.datatorrent.api.Operator;
 import com.datatorrent.api.Operator.InputPort;
@@ -21,8 +21,11 @@ import com.datatorrent.stram.plan.logical.LogicalPlan.InputPortMeta;
 import com.datatorrent.stram.plan.logical.LogicalPlan.OperatorMeta;
 import com.datatorrent.stram.plan.logical.LogicalPlan.OutputPortMeta;
 import com.datatorrent.stram.plan.logical.LogicalPlan.StreamMeta;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
-public class ApexTask implements StreamingApplication{
+public class ApexTask implements StreamingApplication {
 
 	LogicalPlan dag;
   List<OperatorMeta> visited = Lists.newArrayList();
@@ -36,6 +39,7 @@ public class ApexTask implements StreamingApplication{
 	@Override
 	public void populateDAG(DAG dag, Configuration conf) {
 
+	  conf.set("dt.loggers.level","com.datatorrent.*:DEBUG");
     LogicalPlan dag2 = new LogicalPlan();
     for(OperatorMeta o: this.dag.getAllOperators()){
 			System.out.println("Adding Operator: " + o.getName());
@@ -65,14 +69,15 @@ public class ApexTask implements StreamingApplication{
       if(loopStreams.contains(s)) {
         // Add delay Operator
         DefaultDelayOperator d = dag.addOperator("Delay" + s.getName(), new DefaultDelayOperator());
-        dag.addStream("Delay" + s.getName() + "toDelay", (OutputPort<Object>)s.getSource().getPortObject(), d.input);
-        dag.addStream("Delay" + s.getName() + "fromDelay", d.output, (InputPort<Object>)s.getSinks().get(0).getPortObject());
+        dag.addStream("Delay" + s.getName() + "toDelay", (DefaultOutputPort<Object>)s.getSource().getPortObject(), d.input);
+        dag.addStream("Delay" + s.getName() + "fromDelay", d.output, (DefaultInputPort<Object>)s.getSinks().get(0).getPortObject());
         continue;
       }
       for(InputPortMeta i: s.getSinks()) {
         System.out.println(s.getSource().getOperatorMeta().getName()+":"+s.getSource().getPortName()+" --- "+ i.getOperatorWrapper().getName()+":"+i.getPortName());
-        Operator.OutputPort<Object> op = (OutputPort<Object>) s.getSource().getPortObject();
-        Operator.InputPort<Object> ip = (InputPort<Object>) i.getPortObject();
+        DefaultOutputPort<Object> op = (DefaultOutputPort<Object>) s.getSource().getPortObject();
+        DefaultInputPort<Object> ip = (DefaultInputPort<Object>) i.getPortObject();
+        Preconditions.checkArgument(op != null && ip != null);
         dag.addStream(s.getName(), op, ip);
       }
     }

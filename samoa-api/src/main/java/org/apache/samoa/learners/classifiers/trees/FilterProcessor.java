@@ -54,6 +54,9 @@ final class FilterProcessor implements Processor {
   // available streams
   private Stream outputStream;
 
+  public FilterProcessor(){
+    dataset = null;
+  }
   // private constructor based on Builder pattern
   private FilterProcessor(Builder builder) {
     this.dataset = builder.dataset;

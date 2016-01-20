@@ -1,7 +1,5 @@
 package org.apache.samoa.topology.impl;
 
-import com.datatorrent.api.Operator;
-
 /*
  * #%L
  * SAMOA
@@ -23,7 +21,7 @@ import com.datatorrent.api.Operator;
  */
 
 /**
- * Interface to represent a node in samoa-storm topology.
+ * Interface to represent a node in samoa-apex topology.
  * 
  * @author Arinto Murdopo
  * 

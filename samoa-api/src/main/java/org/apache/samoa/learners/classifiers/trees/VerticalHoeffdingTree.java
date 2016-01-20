@@ -34,6 +34,8 @@ import org.apache.samoa.moa.classifiers.core.splitcriteria.SplitCriterion;
 import org.apache.samoa.topology.Stream;
 import org.apache.samoa.topology.TopologyBuilder;
 
+import com.esotericsoftware.kryo.DefaultSerializer;
+import com.esotericsoftware.kryo.serializers.JavaSerializer;
 import com.github.javacliparser.ClassOption;
 import com.github.javacliparser.Configurable;
 import com.github.javacliparser.FlagOption;
@@ -49,6 +51,7 @@ import com.google.common.collect.ImmutableSet;
  * 
  * @author Arinto Murdopo
  */
+@DefaultSerializer(JavaSerializer.class)
 public final class VerticalHoeffdingTree implements ClassificationLearner, AdaptiveLearner, Configurable {
 
   private static final long serialVersionUID = -4937416312929984057L;

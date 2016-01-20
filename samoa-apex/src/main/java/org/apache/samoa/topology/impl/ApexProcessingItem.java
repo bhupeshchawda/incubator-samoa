@@ -31,9 +31,10 @@ import com.datatorrent.api.annotation.InputPortFieldAnnotation;
 import com.datatorrent.api.annotation.OutputPortFieldAnnotation;
 import com.datatorrent.common.util.BaseOperator;
 import com.datatorrent.stram.plan.logical.LogicalPlan.StreamMeta;
+import com.esotericsoftware.kryo.serializers.JavaSerializer;
+import com.esotericsoftware.kryo.serializers.FieldSerializer.Bind;
 import com.google.common.collect.Lists;
 
-import org.apache.hadoop.classification.InterfaceAudience.Public;
 import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.core.Processor;
 import org.apache.samoa.topology.AbstractProcessingItem;
@@ -50,6 +51,7 @@ import org.apache.samoa.utils.PartitioningScheme;
 class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyNode {
 	private final ApexOperator operator;
 	private DAG dag;
+	private int numStreams;
 	
 	// TODO: should we put parallelism hint here?
 	// imo, parallelism hint only declared when we add this PI in the topology
@@ -60,10 +62,16 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 		this(processor, UUID.randomUUID().toString(), parallelismHint);
 	}
 
+	public ApexProcessingItem()
+  {
+	  operator = null;
+  }
+
 	// Constructor
 	ApexProcessingItem(Processor processor, String friendlyId, int parallelismHint) {
 		super(processor, parallelismHint);
 		this.operator = new ApexOperator(processor, parallelismHint);
+		this.operator.setName(getName());
 		this.setName(friendlyId);
 	}
 	
@@ -97,7 +105,7 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 
 	@Override
 	public ApexStream createStream() {
-		return operator.createStream(this.getName());
+		return operator.createStream("Stream_from_" + this.getName() + "_#" + numStreams++);
 	}
 
 	@Override
@@ -112,14 +120,15 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 		return sb.toString();
 	}
 
-	private final static class ApexOperator extends BaseOperator {
+	final static class ApexOperator extends BaseOperator {
 
 		private static final long serialVersionUID = -6637673741263199198L;
+    @Bind(JavaSerializer.class)
 		private final Processor processor;
 		private int instances = 1; // Default
 		
-		public boolean[] usedInputPorts = new boolean[]{false, false, false};
-		public boolean[] usedOutputPorts = new boolean[]{false, false, false};
+		public boolean[] usedInputPorts = new boolean[]{false, false, false, false};
+		public boolean[] usedOutputPorts = new boolean[]{false, false, false, false};
 
 		public ApexOperator()
     {
@@ -140,20 +149,29 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 				processor.process(tuple);
 			}
 		};
-		@InputPortFieldAnnotation(optional=true)
-		public transient DefaultInputPort<ContentEvent> inputPort2 = new DefaultInputPort<ContentEvent>() {
-			@Override
-			public void process(ContentEvent tuple) {
-				processor.process(tuple);
-			}
-		};
+    @InputPortFieldAnnotation(optional=true)
+    public transient DefaultInputPort<ContentEvent> inputPort2 = new DefaultInputPort<ContentEvent>() {
+      @Override
+      public void process(ContentEvent tuple) {
+        processor.process(tuple);
+      }
+    };
+    @InputPortFieldAnnotation(optional=true)
+    public transient DefaultInputPort<ContentEvent> inputPort3 = new DefaultInputPort<ContentEvent>() {
+      @Override
+      public void process(ContentEvent tuple) {
+        processor.process(tuple);
+      }
+    };
 
 		@OutputPortFieldAnnotation(optional=true)
 		public transient DefaultOutputPort<ContentEvent> outputPort0 = new DefaultOutputPort<ContentEvent>();
 		@OutputPortFieldAnnotation(optional=true)
 		public transient DefaultOutputPort<ContentEvent> outputPort1 = new DefaultOutputPort<ContentEvent>();
-		@OutputPortFieldAnnotation(optional=true)
-		public transient DefaultOutputPort<ContentEvent> outputPort2 = new DefaultOutputPort<ContentEvent>();
+    @OutputPortFieldAnnotation(optional=true)
+    public transient DefaultOutputPort<ContentEvent> outputPort2 = new DefaultOutputPort<ContentEvent>();
+    @OutputPortFieldAnnotation(optional=true)
+    public transient DefaultOutputPort<ContentEvent> outputPort3 = new DefaultOutputPort<ContentEvent>();
 
 		ApexOperator(Processor processor, int parallelismHint) {
 			this.processor = processor;
@@ -170,10 +188,14 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 				stream.outputPort = outputPort1;
 				usedOutputPorts[1] = true;
 			}
-			else if(!usedOutputPorts[2]) {
-				stream.outputPort = outputPort2;
-				usedOutputPorts[2] = true;
-			}
+      else if(!usedOutputPorts[2]) {
+        stream.outputPort = outputPort2;
+        usedOutputPorts[2] = true;
+      }
+      else if(!usedOutputPorts[3]) {
+        stream.outputPort = outputPort3;
+        usedOutputPorts[3] = true;
+      }
 			else {
 				throw new RuntimeException("Need more input ports for ApexOperator");
 			}
@@ -189,10 +211,14 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 				stream.inputPort = inputPort1;
 				usedInputPorts[1] = true;
 			}
-			else if(!usedInputPorts[2]) {
-				stream.inputPort = inputPort2;
-				usedInputPorts[2] = true;
-			}
+      else if(!usedInputPorts[2]) {
+        stream.inputPort = inputPort2;
+        usedInputPorts[2] = true;
+      }
+      else if(!usedInputPorts[3]) {
+        stream.inputPort = inputPort3;
+        usedInputPorts[3] = true;
+      }
 			else {
 				throw new RuntimeException("Need more input ports for ApexOperator");
 			}

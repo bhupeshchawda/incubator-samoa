@@ -20,14 +20,18 @@ package org.apache.samoa.topology.impl;
  * #L%
  */
 
-import java.util.UUID;
-
 import com.datatorrent.api.DefaultInputPort;
 import com.datatorrent.api.DefaultOutputPort;
-import com.datatorrent.stram.plan.physical.StreamMapping;
+import com.datatorrent.stram.plan.logical.LogicalPlan;
+import com.datatorrent.stram.plan.logical.LogicalPlan.StreamMeta;
+import com.esotericsoftware.kryo.DefaultSerializer;
+import com.esotericsoftware.kryo.serializers.FieldSerializer.Bind;
+import com.esotericsoftware.kryo.serializers.JavaSerializer;
+
+import java.io.Serializable;
 
 import org.apache.samoa.core.ContentEvent;
-import org.apache.samoa.topology.Stream;
+import org.apache.samoa.topology.AbstractStream;
 
 /**
  * Storm Stream that connects into Bolt. It wraps Storm's outputCollector class
@@ -35,21 +39,23 @@ import org.apache.samoa.topology.Stream;
  * @author Arinto Murdopo
  * 
  */
-class ApexStream implements Stream, java.io.Serializable {
+@DefaultSerializer(JavaSerializer.class)
+class ApexStream extends AbstractStream implements Serializable {
 
 	private static final long serialVersionUID = -5712513402991550847L;
 
 	private String streamId = "";
+	@Bind(JavaSerializer.class)
 	public transient DefaultInputPort<ContentEvent> inputPort = null;
 	public transient DefaultOutputPort<ContentEvent> outputPort = null;
 
-	public ApexStream(String id) {
-		streamId = UUID.randomUUID()+"";
-	}
+  public ApexStream(String id) {
+    streamId = id;
+  }
 	
 	@Override
 	public void put(ContentEvent contentEvent) {
-		outputPort.emit(contentEvent);
+	  outputPort.emit(contentEvent);
 	}
 
 	@Override

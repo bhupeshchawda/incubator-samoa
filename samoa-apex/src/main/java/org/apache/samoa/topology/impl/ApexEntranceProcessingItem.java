@@ -26,6 +26,9 @@ import com.datatorrent.api.DefaultOutputPort;
 import com.datatorrent.api.Context.OperatorContext;
 import com.datatorrent.api.InputOperator;
 import com.datatorrent.common.util.BaseOperator;
+import com.esotericsoftware.kryo.DefaultSerializer;
+import com.esotericsoftware.kryo.serializers.FieldSerializer.Bind;
+import com.esotericsoftware.kryo.serializers.JavaSerializer;
 
 import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.core.EntranceProcessor;
@@ -38,6 +41,12 @@ import org.apache.samoa.topology.Stream;
  */
 class ApexEntranceProcessingItem extends AbstractEntranceProcessingItem implements ApexTopologyNode {
 	private final ApexInputOperator inputOperator;
+	private int numStreams;
+
+	public ApexEntranceProcessingItem()
+  {
+	  inputOperator = null;
+  }
 
 	// Constructor
 	ApexEntranceProcessingItem(EntranceProcessor processor) {
@@ -59,7 +68,7 @@ class ApexEntranceProcessingItem extends AbstractEntranceProcessingItem implemen
 
 	@Override
 	public ApexStream createStream() {
-		return inputOperator.createStream(this.getName());
+		return inputOperator.createStream("Stream_from_" + this.getName() + "_#" + numStreams++);
 	}
 
 //	@Override
@@ -85,6 +94,7 @@ class ApexEntranceProcessingItem extends AbstractEntranceProcessingItem implemen
 	final static class ApexInputOperator extends BaseOperator implements InputOperator {
 
 		private final Stream stream;
+		@Bind(JavaSerializer.class)
 		private final EntranceProcessor entranceProcessor;
 		private ApexStream outputStream = null;
 		private transient final DefaultOutputPort<ContentEvent> outputPort = new DefaultOutputPort<ContentEvent>();
