@@ -87,46 +87,4 @@ class ApexEntranceProcessingItem extends AbstractEntranceProcessingItem implemen
 		sb.insert(0, String.format("id: %s, ", this.getName()));
 		return sb.toString();
 	}
-
-	/**
-	 * Resulting Spout of StormEntranceProcessingItem
-	 */
-	final static class ApexInputOperator extends BaseOperator implements InputOperator {
-
-		private final Stream stream;
-		@Bind(JavaSerializer.class)
-		private final EntranceProcessor entranceProcessor;
-		private ApexStream outputStream = null;
-		private transient final DefaultOutputPort<ContentEvent> outputPort = new DefaultOutputPort<ContentEvent>();
-
-		public ApexInputOperator()
-		{
-		  stream = null;
-		  entranceProcessor = null;
-		}
-
-		ApexInputOperator(EntranceProcessor processor) {
-			this.entranceProcessor = processor;
-			stream = null;
-		}
-
-		ApexStream createStream(String piId) {
-			ApexStream stream = new ApexStream(piId);
-			outputStream = stream;
-			stream.outputPort = outputPort;
-			return stream;
-		}
-
-		@Override
-		public void setup(OperatorContext context) {
-			this.entranceProcessor.onCreate(context.getId());
-		}
-
-		@Override
-		public void emitTuples() {
-			if(entranceProcessor.hasNext()){
-				outputPort.emit(entranceProcessor.nextEvent());
-			}
-		}
-	}
 }

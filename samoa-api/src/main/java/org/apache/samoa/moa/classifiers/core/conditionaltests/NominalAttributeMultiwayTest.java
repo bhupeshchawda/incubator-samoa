@@ -35,6 +35,10 @@ public class NominalAttributeMultiwayTest extends InstanceConditionalTest {
 
   protected int attIndex;
 
+  public NominalAttributeMultiwayTest()
+  {
+  }
+
   public NominalAttributeMultiwayTest(int attIndex) {
     this.attIndex = attIndex;
   }

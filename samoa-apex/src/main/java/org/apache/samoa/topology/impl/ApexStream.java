@@ -23,12 +23,15 @@ package org.apache.samoa.topology.impl;
 import com.datatorrent.api.DefaultInputPort;
 import com.datatorrent.api.DefaultOutputPort;
 import com.datatorrent.stram.plan.logical.LogicalPlan;
+import com.datatorrent.stram.plan.logical.LogicalPlan.OutputPortMeta;
 import com.datatorrent.stram.plan.logical.LogicalPlan.StreamMeta;
 import com.esotericsoftware.kryo.DefaultSerializer;
+import com.esotericsoftware.kryo.serializers.DefaultSerializers.KryoSerializableSerializer;
 import com.esotericsoftware.kryo.serializers.FieldSerializer.Bind;
 import com.esotericsoftware.kryo.serializers.JavaSerializer;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.topology.AbstractStream;
@@ -45,12 +48,13 @@ class ApexStream extends AbstractStream implements Serializable {
 	private static final long serialVersionUID = -5712513402991550847L;
 
 	private String streamId = "";
-	@Bind(JavaSerializer.class)
-	public transient DefaultInputPort<ContentEvent> inputPort = null;
-	public transient DefaultOutputPort<ContentEvent> outputPort = null;
+	private UUID id;
+	public DefaultInputPort<ContentEvent> inputPort;
+	public DefaultOutputPort<ContentEvent> outputPort;
 
   public ApexStream(String id) {
     streamId = id;
+    this.id = UUID.randomUUID();
   }
 	
 	@Override
