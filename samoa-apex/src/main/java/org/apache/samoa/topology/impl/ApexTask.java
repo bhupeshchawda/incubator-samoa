@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
-
+import org.apache.samoa.core.ContentEvent;
 
 import com.datatorrent.api.DAG;
 import com.datatorrent.api.DefaultInputPort;
@@ -36,7 +36,8 @@ public class ApexTask implements StreamingApplication {
 		System.out.println("Dag Set in Apex Task" + this.dag);
 	}
 
-	@Override
+	@SuppressWarnings("unchecked")
+  @Override
 	public void populateDAG(DAG dag, Configuration conf) {
 
 	  conf.set("dt.loggers.level","com.datatorrent.*:DEBUG");
@@ -68,9 +69,9 @@ public class ApexTask implements StreamingApplication {
       System.out.println("Stream: " + s.getName());
       if(loopStreams.contains(s)) {
         // Add delay Operator
-        DefaultDelayOperator d = dag.addOperator("Delay" + s.getName(), new DefaultDelayOperator());
-        dag.addStream("Delay" + s.getName() + "toDelay", (DefaultOutputPort<Object>)s.getSource().getPortObject(), d.input);
-        dag.addStream("Delay" + s.getName() + "fromDelay", d.output, (DefaultInputPort<Object>)s.getSinks().get(0).getPortObject());
+        DefaultDelayOperator<ContentEvent> d = dag.addOperator("Delay" + s.getName(), new DefaultDelayOperator<ContentEvent>());
+        dag.addStream("Delay" + s.getName() + "toDelay", (DefaultOutputPort<ContentEvent>)s.getSource().getPortObject(), d.input);
+        dag.addStream("Delay" + s.getName() + "fromDelay", d.output, (DefaultInputPort<ContentEvent>)s.getSinks().get(0).getPortObject());
         continue;
       }
       for(InputPortMeta i: s.getSinks()) {
