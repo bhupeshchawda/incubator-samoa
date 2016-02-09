@@ -131,6 +131,7 @@ final class ModelAggregatorProcessor implements Processor {
 
     // Receive a new instance from source
     if (event instanceof InstancesContentEvent) {
+      System.out.println("InstanceContentEvent");
       InstancesContentEvent instancesEvent = (InstancesContentEvent) event;
       this.processInstanceContentEvent(instancesEvent);
       // Send information to local-statistic PI
@@ -158,6 +159,7 @@ final class ModelAggregatorProcessor implements Processor {
       }
       this.foundNodeSet = null;
     } else if (event instanceof LocalResultContentEvent) {
+      System.out.println("LocalResultContentEvent");
       LocalResultContentEvent lrce = (LocalResultContentEvent) event;
       Long lrceSplitId = lrce.getSplitId();
       SplittingNodeInfo splittingNodeInfo = splittingNodes.get(lrceSplitId);
@@ -170,12 +172,14 @@ final class ModelAggregatorProcessor implements Processor {
         activeLearningNode.addDistributedSuggestions(lrce.getBestSuggestion(), lrce.getSecondBestSuggestion());
 
         if (activeLearningNode.isAllSuggestionsCollected()) {
+          System.out.println("All suggestions collected. Continuing to split");
           splittingNodeInfo.scheduledFuture.cancel(false);
           this.splittingNodes.remove(lrceSplitId);
           this.continueAttemptToSplit(activeLearningNode, splittingNodeInfo.foundNode);
         }
       }
     }
+    System.out.println(toString());
     return false;
   }
 
@@ -493,6 +497,7 @@ final class ModelAggregatorProcessor implements Processor {
       double hoeffdingBound = computeHoeffdingBound(
           this.splitCriterion.getRangeOfMerit(activeLearningNode.getObservedClassDistribution()), this.splitConfidence,
           activeLearningNode.getWeightSeen());
+      System.out.println("Computing Bound: " + hoeffdingBound + "Best Suggestion Merit: " + bestSuggestion.merit + " Second best Suggestion Merit: " + secondBestSuggestion.merit);
 
       if ((bestSuggestion.merit - secondBestSuggestion.merit > hoeffdingBound) || (hoeffdingBound < tieThreshold)) {
         shouldSplit = true;
@@ -505,7 +510,7 @@ final class ModelAggregatorProcessor implements Processor {
 
     // split if the Hoeffding bound condition is satisfied
     if (shouldSplit) {
-
+      System.out.println("Should Split");
       if (bestSuggestion.splitTest != null) {
         SplitNode newSplit = new SplitNode(bestSuggestion.splitTest, activeLearningNode.getObservedClassDistribution());
 

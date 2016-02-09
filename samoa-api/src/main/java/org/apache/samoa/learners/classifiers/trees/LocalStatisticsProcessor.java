@@ -85,6 +85,7 @@ final class LocalStatisticsProcessor implements Processor {
   public boolean process(ContentEvent event) {
     // process AttributeContentEvent by updating the subset of local statistics
     if (event instanceof AttributeBatchContentEvent) {
+      System.out.println("AttributeBatchContentEvent");
       AttributeBatchContentEvent abce = (AttributeBatchContentEvent) event;
       List<ContentEvent> contentEventList = abce.getContentEventList();
       for (ContentEvent contentEvent : contentEventList) {
@@ -118,6 +119,7 @@ final class LocalStatisticsProcessor implements Processor {
        * ace.getClassVal(), ace.getWeight());
        */
     } else if (event instanceof ComputeContentEvent) {
+      System.out.println("ComputeContentEvent");
       // process ComputeContentEvent by calculating the local statistic
       // and send back the calculation results via computation result stream.
       ComputeContentEvent cce = (ComputeContentEvent) event;
@@ -158,6 +160,7 @@ final class LocalStatisticsProcessor implements Processor {
       LocalResultContentEvent lcre =
           new LocalResultContentEvent(cce.getSplitId(), bestSuggestion, secondBestSuggestion);
       computationResultStream.put(lcre);
+      System.out.println("Sent LocalResult");
       logger.debug("Finish compute event");
     } else if (event instanceof DeleteContentEvent) {
       DeleteContentEvent dce = (DeleteContentEvent) event;
