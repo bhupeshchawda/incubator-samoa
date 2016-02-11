@@ -28,7 +28,7 @@ import org.junit.Test;
 public class AlgosTestApex {
 
   @Test(timeout = 600000)
-  public void testVHTWithStorm() throws Exception {
+  public void testVHTWithApex() throws Exception {
 
     TestParams vhtConfig = new TestParams.Builder()
         .inputInstances(200_000)
@@ -48,7 +48,7 @@ public class AlgosTestApex {
   }
 
   @Test(timeout = 120000)
-  public void testBaggingWithStorm() throws Exception {
+  public void testBaggingWithApex() throws Exception {
     TestParams baggingConfig = new TestParams.Builder()
         .inputInstances(200_000)
         .samplingSize(20_000)

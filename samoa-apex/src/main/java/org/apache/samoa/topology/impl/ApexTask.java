@@ -36,7 +36,6 @@ public class ApexTask implements StreamingApplication {
 
 	public ApexTask(ApexTopology apexTopo) {
 		this.dag = (LogicalPlan) apexTopo.getDAG();
-		System.out.println("Dag Set in Apex Task" + this.dag);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -46,30 +45,23 @@ public class ApexTask implements StreamingApplication {
 	  conf.set("dt.loggers.level","com.datatorrent.*:DEBUG");
     LogicalPlan dag2 = new LogicalPlan();
     for(OperatorMeta o: this.dag.getAllOperators()){
-			System.out.println("Adding Operator: " + o.getName());
 			dag2.addOperator(o.getName(), o.getOperator());
 		}
 		for(StreamMeta s: this.dag.getAllStreams()) {
-			System.out.println("Stream: " + s.getName());
 			for(InputPortMeta i: s.getSinks()) {
-				System.out.println(s.getSource().getOperatorMeta().getName()+":"+s.getSource().getPortName()+" --- "+ i.getOperatorWrapper().getName()+":"+i.getPortName());
 				Operator.OutputPort<Object> op = (OutputPort<Object>) s.getSource().getPortObject();
 				Operator.InputPort<Object> ip = (InputPort<Object>) i.getPortObject();
 				dag2.addStream(s.getName(), op, ip);
 			}
 		}
 
-		System.out.println("Dag Set in Populate DAG" + dag2);
 		detectLoops(dag2, conf);
-		System.out.println("Loop Streams: " + loopStreams);
 		
 		// Reconstruct Dag
     for(OperatorMeta o: this.dag.getAllOperators()){
-      System.out.println("Adding Operator: " + o.getName());
       dag.addOperator(o.getName(), o.getOperator());
     }
     for(StreamMeta s: this.dag.getAllStreams()) {
-      System.out.println("Stream: " + s.getName());
       if(loopStreams.contains(s)) {
         // Add delay Operator
         DefaultDelayOperator<ContentEvent> d = dag.addOperator("Delay" + s.getName(), new DefaultDelayOperator<ContentEvent>());
@@ -78,7 +70,6 @@ public class ApexTask implements StreamingApplication {
         continue;
       }
       for(InputPortMeta i: s.getSinks()) {
-        System.out.println(s.getSource().getOperatorMeta().getName()+":"+s.getSource().getPortName()+" --- "+ i.getOperatorWrapper().getName()+":"+i.getPortName());
         DefaultOutputPort<Object> op = (DefaultOutputPort<Object>) s.getSource().getPortObject();
         DefaultInputPort<Object> ip = (DefaultInputPort<Object>) i.getPortObject();
         Preconditions.checkArgument(op != null && ip != null);
