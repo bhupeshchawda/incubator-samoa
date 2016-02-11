@@ -23,9 +23,6 @@ package org.apache.samoa.tasks;
 import org.apache.samoa.topology.ComponentFactory;
 import org.apache.samoa.topology.Topology;
 
-import com.esotericsoftware.kryo.DefaultSerializer;
-import com.esotericsoftware.kryo.serializers.JavaSerializer;
-
 /**
  * Task interface, the mother of all SAMOA tasks!
  */

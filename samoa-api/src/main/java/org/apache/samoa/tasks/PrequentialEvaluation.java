@@ -42,8 +42,6 @@ import org.apache.samoa.topology.TopologyBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.esotericsoftware.kryo.DefaultSerializer;
-import com.esotericsoftware.kryo.serializers.JavaSerializer;
 import com.github.javacliparser.ClassOption;
 import com.github.javacliparser.Configurable;
 import com.github.javacliparser.FileOption;
@@ -57,7 +55,6 @@ import com.github.javacliparser.StringOption;
  * @author Arinto Murdopo
  * 
  */
-@DefaultSerializer(JavaSerializer.class)
 public class PrequentialEvaluation implements Task, Configurable {
 
   private static final long serialVersionUID = -8246537378371580550L;

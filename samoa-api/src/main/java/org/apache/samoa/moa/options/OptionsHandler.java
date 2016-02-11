@@ -26,8 +26,6 @@ import org.apache.samoa.moa.core.ObjectRepository;
 import org.apache.samoa.moa.tasks.NullMonitor;
 import org.apache.samoa.moa.tasks.TaskMonitor;
 
-import com.esotericsoftware.kryo.DefaultSerializer;
-import com.esotericsoftware.kryo.serializers.JavaSerializer;
 import com.github.javacliparser.JavaCLIParser;
 import com.github.javacliparser.Option;
 
@@ -40,7 +38,6 @@ import com.github.javacliparser.Option;
  * 
  * @author abifet
  */
-@DefaultSerializer(JavaSerializer.class)
 public class OptionsHandler extends JavaCLIParser {
 
   // public Object handler;

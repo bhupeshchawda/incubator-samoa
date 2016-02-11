@@ -76,7 +76,7 @@ public class ApexTask implements StreamingApplication {
         dag.addStream(s.getName(), op, ip);
       }
     }
-    dag.setAttribute(DAGContext.STREAMING_WINDOW_SIZE_MILLIS, 100);
+    dag.setAttribute(DAGContext.STREAMING_WINDOW_SIZE_MILLIS, 50);
 	}
 
 	public void detectLoops(DAG dag, Configuration conf) {

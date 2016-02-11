@@ -35,16 +35,12 @@ import org.apache.samoa.moa.options.AbstractOptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.esotericsoftware.kryo.DefaultSerializer;
-import com.esotericsoftware.kryo.serializers.JavaSerializer;
-
 /**
  * Prequential Source Processor is the processor for Prequential Evaluation Task.
  * 
  * @author Arinto Murdopo
  * 
  */
-@DefaultSerializer(JavaSerializer.class)
 public final class PrequentialSourceProcessor implements EntranceProcessor {
 
   private static final long serialVersionUID = 4169053337917578558L;
@@ -103,6 +99,7 @@ public final class PrequentialSourceProcessor implements EntranceProcessor {
     else if (hasNext()) {
       numInstanceSent++;
       contentEvent = new InstanceContentEvent(numInstanceSent, nextInstance(), true, true);
+
       // first call to this method will trigger the timer
       if (schedule == null && delay > 0) {
         schedule = timer.scheduleWithFixedDelay(new DelayTimeoutHandler(this), delay, delay,
