@@ -1,6 +1,7 @@
 package org.apache.samoa.topology.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -8,6 +9,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.samoa.core.ContentEvent;
 import org.jboss.netty.channel.socket.DatagramChannelConfig;
 
+import com.datatorrent.api.Attribute;
+import com.datatorrent.api.Attribute.AttributeMap;
 import com.datatorrent.api.Context.DAGContext;
 import com.datatorrent.api.DAG;
 import com.datatorrent.api.DefaultInputPort;
@@ -18,6 +21,7 @@ import com.datatorrent.api.Operator.InputPort;
 import com.datatorrent.api.Operator.OutputPort;
 import com.datatorrent.common.util.DefaultDelayOperator;
 import com.datatorrent.api.StreamingApplication;
+import com.datatorrent.api.annotation.ApplicationAnnotation;
 import com.datatorrent.stram.engine.OperatorContext;
 import com.datatorrent.stram.plan.logical.LogicalPlan;
 import com.datatorrent.stram.plan.logical.LogicalPlan.InputPortMeta;
@@ -28,6 +32,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+@ApplicationAnnotation(name="SAMOA-on-Apache-Apex")
 public class ApexTask implements StreamingApplication {
 
 	LogicalPlan dag;
@@ -76,6 +81,7 @@ public class ApexTask implements StreamingApplication {
         dag.addStream(s.getName(), op, ip);
       }
     }
+
     dag.setAttribute(DAGContext.STREAMING_WINDOW_SIZE_MILLIS, 50);
 	}
 

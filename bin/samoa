@@ -344,6 +344,44 @@ elif [ $PLATFORM = 'FLINK' ]; then
                 $FLINK_EXEC run $DEPLOYABLE $COMPLETE_ARG
         fi                                                    
 
+elif [ $PLATFORM = 'APEX' ]; then
+
+    echo "Deploying to $PLATFORM"
+    if [ -z $APEX_HOME ];then
+        echo "APEX_HOME is not set!"
+        echo "Please set APEX_HOME to point to your Apex installation or top level source directory"
+        exit -1
+    fi
+
+    if [ ! -f $2 ];then
+        echo "$2 does not exist!"
+        echo "Please use a valid jar file for Apex execution"
+        exit -1
+    fi
+
+    APEX_EXEC="$APEX_HOME/engine/src/main/scripts/dtcli"
+
+    SAMOA_APEX_PROPERTIES="samoa-apex.properties"
+    MODE_OPTION="samoa.apex.mode"
+
+    VALUE=""
+    getvalue()
+        {
+        VALUE=`sed '/^\#/d' $BASE_DIR/$SAMOA_APEX_PROPERTIES | grep "$1" | tail -n 1 | cut -d "=" -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'`
+        }
+    
+    getvalue "$MODE_OPTION"
+    MODE_ARG="$VALUE"
+
+    DEPLOYABLE=$JAR_PATH
+    echo "Deployable: " $DEPLOYABLE
+    if [ "$MODE_ARG" = "cluster" ]; then
+        echo "launch $DEPLOYABLE"
+        echo "launch $DEPLOYABLE" | $APEX_EXEC
+    elif [ "$MODE_ARG" = "local" ]; then
+        echo "launch -local $DEPLOYABLE" | $APEX_EXEC
+    fi
+
 elif [ $PLATFORM = 'THREADS' ]; then
 	
 	echo "Deploying to LOCAL with MULTITHREADING."

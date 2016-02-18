@@ -54,8 +54,6 @@ public class LocalApexDoTask {
 
 	    List<String> tmpArgs = new ArrayList<String>(Arrays.asList(args));
 
-	    int numWorker = ApexSamoaUtils.numWorkers(tmpArgs);
-
 	    args = tmpArgs.toArray(new String[0]);
 
 	    // convert the arguments into Storm topology

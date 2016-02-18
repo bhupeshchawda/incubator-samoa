@@ -1,6 +1,5 @@
 package org.apache.samoa.topology.impl;
 
-import java.io.Serializable;
 
 /*
  * #%L
@@ -22,22 +21,13 @@ import java.io.Serializable;
  * #L%
  */
 
-import java.util.List;
-import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
+import com.datatorrent.api.Context;
 import com.datatorrent.api.DAG;
-import com.datatorrent.api.DefaultInputPort;
-import com.datatorrent.api.DefaultOutputPort;
-import com.datatorrent.api.Context.OperatorContext;
-import com.datatorrent.api.annotation.InputPortFieldAnnotation;
-import com.datatorrent.api.annotation.OutputPortFieldAnnotation;
-import com.datatorrent.common.util.BaseOperator;
-import com.datatorrent.stram.plan.logical.LogicalPlan.StreamMeta;
-import com.esotericsoftware.kryo.serializers.JavaSerializer;
-import com.esotericsoftware.kryo.serializers.FieldSerializer.Bind;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.datatorrent.common.partitioner.StatelessPartitioner;
+import com.datatorrent.stram.codec.DefaultStatefulStreamCodec;
 
 import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.core.Processor;
@@ -56,6 +46,7 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 	private final ApexOperator operator;
 	private DAG dag;
 	private int numStreams;
+	private int numPartitions = 1;
 	
 	// TODO: should we put parallelism hint here?
 	// imo, parallelism hint only declared when we add this PI in the topology
@@ -77,25 +68,38 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 		this.operator = new ApexOperator(processor, parallelismHint);
 		this.operator.setName(getName());
 		this.setName(friendlyId);
+		this.numPartitions = parallelismHint;
 	}
 	
 	@Override
 	protected ProcessingItem addInputStream(Stream inputStream, PartitioningScheme scheme) {
 		ApexStream apexStream = (ApexStream) inputStream;
-		
-		// Setup stream codecs here
-		switch(scheme) {
-		case SHUFFLE:
-			break;
-		case BROADCAST:
-			break;
-		case GROUP_BY_KEY:
-			break;
-		default:
-			// Should never occur
-		}
 		this.operator.addInputStream(apexStream);
 		dag.addStream(apexStream.getStreamId(), apexStream.outputPort, apexStream.inputPort);
+
+    // Setup stream codecs here
+    switch(scheme) {
+    case SHUFFLE:
+      dag.setInputPortAttribute(apexStream.inputPort, Context.PortContext.STREAM_CODEC, 
+              new StreamUtils.RandomStreamCodec<ContentEvent>());
+      System.out.println("Setting Shuffle mapping on " + apexStream.getStreamId());
+      break;
+    case BROADCAST:
+      dag.setAttribute(this.operator, Context.OperatorContext.PARTITIONER, new StreamUtils.AllPartitioner<ApexOperator>(numPartitions));
+      break;
+    case GROUP_BY_KEY:
+      dag.setInputPortAttribute(apexStream.inputPort, Context.PortContext.STREAM_CODEC, 
+              new StreamUtils.KeyBasedStreamCodec<ContentEvent>());
+      break;
+    default:
+      // Should never occur
+      throw new RuntimeException("Unknown partitioning scheme");
+    }
+
+    if( ! dag.getAttributes().contains(Context.OperatorContext.PARTITIONER)) {
+      System.out.println("Setting " + this.operator.processor.getClass() + " to " + numPartitions + " instances.");
+      dag.setAttribute(this.operator, Context.OperatorContext.PARTITIONER, new StatelessPartitioner<>(numPartitions));
+    }
 		return this;
 	}
 
@@ -123,4 +127,36 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 		sb.insert(0, String.format("id: %s, ", this.getName()));
 		return sb.toString();
 	}
+
+  public static class RandomStreamCodec extends DefaultStatefulStreamCodec<ContentEvent>
+  {
+    Random r;
+    public RandomStreamCodec()
+    {
+      r = new Random();
+    }
+    @Override
+    public int getPartition(ContentEvent tuple)
+    {
+      return r.nextInt();
+    }
+  }
+
+  public static class KeyBasedStreamCodec extends DefaultStatefulStreamCodec<ContentEvent>
+  {
+    @Override
+    public int getPartition(ContentEvent tuple)
+    {
+      return tuple.getKey().hashCode();
+    }
+  }
+
+  public static class AllStreamCodec extends DefaultStatefulStreamCodec<ContentEvent>
+  {
+    @Override
+    public int getPartition(ContentEvent tuple)
+    {
+      return tuple.getKey().hashCode();
+    }
+  }
 }

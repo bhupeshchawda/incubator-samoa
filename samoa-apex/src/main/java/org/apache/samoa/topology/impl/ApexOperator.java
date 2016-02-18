@@ -2,6 +2,7 @@ package org.apache.samoa.topology.impl;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.core.Processor;
@@ -12,6 +13,7 @@ import com.datatorrent.api.Context.OperatorContext;
 import com.datatorrent.api.annotation.InputPortFieldAnnotation;
 import com.datatorrent.api.annotation.OutputPortFieldAnnotation;
 import com.datatorrent.common.util.BaseOperator;
+import com.datatorrent.stram.codec.DefaultStatefulStreamCodec;
 import com.esotericsoftware.kryo.DefaultSerializer;
 import com.esotericsoftware.kryo.serializers.JavaSerializer;
 import com.esotericsoftware.kryo.serializers.FieldSerializer.Bind;
@@ -21,11 +23,11 @@ import com.google.common.collect.Maps;
 public class ApexOperator extends BaseOperator implements Serializable {
 
   private static final long serialVersionUID = -6637673741263199198L;
-  private final Processor processor;
+  public final Processor processor;
   public int instances = 1; // Default
   
-  public boolean[] usedInputPorts = new boolean[]{false, false, false, false};
-  public boolean[] usedOutputPorts = new boolean[]{false, false, false, false};
+  public boolean[] usedInputPorts = new boolean[]{false, false, false, false, false};
+  public boolean[] usedOutputPorts = new boolean[]{false, false, false, false, false};
 
   public ApexOperator()
   {
@@ -60,6 +62,13 @@ public class ApexOperator extends BaseOperator implements Serializable {
       processor.process(tuple);
     }
   };
+  @InputPortFieldAnnotation(optional=true)
+  public DefaultInputPortSerializable<ContentEvent> inputPort4 = new DefaultInputPortSerializable<ContentEvent>() {
+    @Override
+    public void process(ContentEvent tuple) {
+      processor.process(tuple);
+    }
+  };
 
   @OutputPortFieldAnnotation(optional=true)
   public DefaultOutputPortSerializable<ContentEvent> outputPort0 = new DefaultOutputPortSerializable<ContentEvent>();
@@ -69,6 +78,8 @@ public class ApexOperator extends BaseOperator implements Serializable {
   public DefaultOutputPortSerializable<ContentEvent> outputPort2 = new DefaultOutputPortSerializable<ContentEvent>();
   @OutputPortFieldAnnotation(optional=true)
   public DefaultOutputPortSerializable<ContentEvent> outputPort3 = new DefaultOutputPortSerializable<ContentEvent>();
+  @OutputPortFieldAnnotation(optional=true)
+  public DefaultOutputPortSerializable<ContentEvent> outputPort4 = new DefaultOutputPortSerializable<ContentEvent>();
 
   ApexOperator(Processor processor, int parallelismHint) {
     this.processor = processor;
@@ -99,6 +110,10 @@ public class ApexOperator extends BaseOperator implements Serializable {
       stream.outputPort = outputPort3;
       usedOutputPorts[3] = true;
     }
+    else if(!usedOutputPorts[4]) {
+      stream.outputPort = outputPort4;
+      usedOutputPorts[4] = true;
+    }
     else {
       throw new RuntimeException("Need more input ports for ApexOperator");
     }
@@ -121,6 +136,10 @@ public class ApexOperator extends BaseOperator implements Serializable {
     else if(!usedInputPorts[3]) {
       stream.inputPort = inputPort3;
       usedInputPorts[3] = true;
+    }
+    else if(!usedInputPorts[4]) {
+      stream.inputPort = inputPort4;
+      usedInputPorts[4] = true;
     }
     else {
       throw new RuntimeException("Need more input ports for ApexOperator");
