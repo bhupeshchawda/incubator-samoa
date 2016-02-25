@@ -16,6 +16,10 @@ import com.esotericsoftware.kryo.serializers.FieldSerializer.Bind;
 @DefaultSerializer(JavaSerializer.class)
 public class ApexInputOperator extends BaseOperator implements InputOperator, Serializable {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 4255026962166445721L;
   private final EntranceProcessor entranceProcessor;
   private final DefaultOutputPortSerializable<ContentEvent> outputPort = new DefaultOutputPortSerializable<ContentEvent>();
 

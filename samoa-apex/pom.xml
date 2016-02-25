@@ -24,8 +24,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- change this if you desire to use a different version of DataTorrent -->
-    <datatorrent.version>3.4.0-incubating-SNAPSHOT</datatorrent.version>
-    <datatorrent.apppackage.classpath>lib/*.jar</datatorrent.apppackage.classpath>
+    <apex.version>3.4.0-incubating-SNAPSHOT</apex.version>
+    <apex.apppackage.classpath>lib/*.jar</apex.apppackage.classpath>
   </properties>
 
   <name>samoa-apex</name>
@@ -108,11 +108,16 @@
             <artifactId>log4j-over-slf4j</artifactId>
             <version>1.7.13</version>
         </dependency>
+	    <dependency>
+	      <groupId>jline</groupId>
+	      <artifactId>jline</artifactId>
+	      <version>2.11</version>
+	    </dependency>
   </dependencies>
 
   <build>
     <plugins>
-      <!-- SAMOA assembly -->
+      <!-- Apex assembly -->
 
 <!--  <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -155,7 +160,6 @@
           <redirectTestOutputToFile>false</redirectTestOutputToFile>
         </configuration>
       </plugin> -->
-
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -206,7 +210,7 @@
               <goal>single</goal>
             </goals>
             <configuration>
-              <finalName>SAMOA-Apex-${project.version}</finalName>
+              <finalName>${project.artifactId}-${project.version}-apexapp</finalName>
               <appendAssemblyId>false</appendAssemblyId>
               <descriptors>
                 <descriptor>src/assemble/appPackage.xml</descriptor>
@@ -216,7 +220,7 @@
               </archiverConfig>
               <archive>
                 <manifestEntries>
-                  <Class-Path>${datatorrent.apppackage.classpath}</Class-Path>
+                  <Class-Path>${apex.apppackage.classpath}</Class-Path>
                   <DT-Engine-Version>${apex.version}</DT-Engine-Version>
                   <DT-App-Package-Name>${project.artifactId}</DT-App-Package-Name>
                   <DT-App-Package-Version>${project.version}</DT-App-Package-Version>
@@ -237,8 +241,8 @@
             <phase>package</phase>
             <configuration>
               <target>
-                <move file="${project.build.directory}/SAMOA-Apex-${project.version}.jar"
-                      tofile="${project.build.directory}/SAMOA-Apex-${project.version}.apa" />
+                <move file="${project.build.directory}/${project.artifactId}-${project.version}-apexapp.jar"
+                      tofile="${project.build.directory}/${project.artifactId}-${project.version}.apa" />
               </target>
             </configuration>
             <goals>
@@ -276,90 +280,11 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>target/SAMOA-Apex-${project.version}.apa</file>
+                  <file>target/${project.artifactId}-${project.version}.apa</file>
                   <type>apa</type>
                 </artifact>
               </artifacts>
               <skipAttach>false</skipAttach>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- generate javdoc -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <executions>
-          <!-- generate xml javadoc -->
-          <execution>
-            <id>xml-doclet</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>javadoc</goal>
-            </goals>
-            <configuration>
-              <doclet>com.github.markusbernhardt.xmldoclet.XmlDoclet</doclet>
-              <additionalparam>-d ${project.build.directory}/generated-resources/xml-javadoc -filename SAMOA-Apex-${project.version}-javadoc.xml</additionalparam>
-              <useStandardDocletOptions>false</useStandardDocletOptions>
-              <docletArtifact>
-                <groupId>com.github.markusbernhardt</groupId>
-                <artifactId>xml-doclet</artifactId>
-                <version>1.0.4</version>
-              </docletArtifact>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Transform xml javadoc to stripped down version containing only class/interface comments and tags-->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>xml-maven-plugin</artifactId>
-        <version>1.0</version>
-        <executions>
-          <execution>
-            <id>transform-xmljavadoc</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>transform</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <transformationSets>
-            <transformationSet>
-              <dir>${project.build.directory}/generated-resources/xml-javadoc</dir>
-              <includes>
-                <include>SAMOA-Apex-${project.version}-javadoc.xml</include>
-              </includes>
-              <stylesheet>XmlJavadocCommentsExtractor.xsl</stylesheet>
-              <outputDir>${project.build.directory}/generated-resources/xml-javadoc</outputDir>
-            </transformationSet>
-          </transformationSets>
-        </configuration>
-      </plugin>
-      <!-- copy xml javadoc to class jar -->
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.6</version>
-        <executions>
-          <execution>
-            <id>copy-resources</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${project.build.directory}/generated-resources/xml-javadoc</directory>
-                  <includes>
-                    <include>SAMOA-Apex-${project.version}-javadoc.xml</include>
-                  </includes>
-                  <filtering>true</filtering>
-                </resource>
-              </resources>
             </configuration>
           </execution>
         </executions>
