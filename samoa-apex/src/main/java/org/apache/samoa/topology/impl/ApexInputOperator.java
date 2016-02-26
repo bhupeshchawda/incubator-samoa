@@ -5,13 +5,11 @@ import java.io.Serializable;
 import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.core.EntranceProcessor;
 
-import com.datatorrent.api.DefaultOutputPort;
 import com.datatorrent.api.InputOperator;
 import com.datatorrent.api.Context.OperatorContext;
 import com.datatorrent.common.util.BaseOperator;
 import com.esotericsoftware.kryo.DefaultSerializer;
 import com.esotericsoftware.kryo.serializers.JavaSerializer;
-import com.esotericsoftware.kryo.serializers.FieldSerializer.Bind;
 
 @DefaultSerializer(JavaSerializer.class)
 public class ApexInputOperator extends BaseOperator implements InputOperator, Serializable {

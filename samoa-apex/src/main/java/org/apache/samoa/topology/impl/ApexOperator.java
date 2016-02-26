@@ -1,23 +1,14 @@
 package org.apache.samoa.topology.impl;
 
 import java.io.Serializable;
-import java.util.Map;
-import java.util.Random;
-
 import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.core.Processor;
-
-import com.datatorrent.api.DefaultInputPort;
-import com.datatorrent.api.DefaultOutputPort;
 import com.datatorrent.api.Context.OperatorContext;
 import com.datatorrent.api.annotation.InputPortFieldAnnotation;
 import com.datatorrent.api.annotation.OutputPortFieldAnnotation;
 import com.datatorrent.common.util.BaseOperator;
-import com.datatorrent.stram.codec.DefaultStatefulStreamCodec;
 import com.esotericsoftware.kryo.DefaultSerializer;
 import com.esotericsoftware.kryo.serializers.JavaSerializer;
-import com.esotericsoftware.kryo.serializers.FieldSerializer.Bind;
-import com.google.common.collect.Maps;
 
 @DefaultSerializer(JavaSerializer.class)
 public class ApexOperator extends BaseOperator implements Serializable {
@@ -34,6 +25,7 @@ public class ApexOperator extends BaseOperator implements Serializable {
     processor = null;
   }
 
+  @SuppressWarnings("serial")
   @InputPortFieldAnnotation(optional=true)
   public DefaultInputPortSerializable<ContentEvent> inputPort0 = new DefaultInputPortSerializable<ContentEvent>() {
     @Override
@@ -41,6 +33,7 @@ public class ApexOperator extends BaseOperator implements Serializable {
       processor.process(tuple);
     }
   };
+  @SuppressWarnings("serial")
   @InputPortFieldAnnotation(optional=true)
   public DefaultInputPortSerializable<ContentEvent> inputPort1 = new DefaultInputPortSerializable<ContentEvent>() {
     @Override
@@ -48,6 +41,7 @@ public class ApexOperator extends BaseOperator implements Serializable {
       processor.process(tuple);
     }
   };
+  @SuppressWarnings("serial")
   @InputPortFieldAnnotation(optional=true)
   public DefaultInputPortSerializable<ContentEvent> inputPort2 = new DefaultInputPortSerializable<ContentEvent>() {
     @Override
@@ -55,6 +49,7 @@ public class ApexOperator extends BaseOperator implements Serializable {
       processor.process(tuple);
     }
   };
+  @SuppressWarnings("serial")
   @InputPortFieldAnnotation(optional=true)
   public DefaultInputPortSerializable<ContentEvent> inputPort3 = new DefaultInputPortSerializable<ContentEvent>() {
     @Override
@@ -62,6 +57,7 @@ public class ApexOperator extends BaseOperator implements Serializable {
       processor.process(tuple);
     }
   };
+  @SuppressWarnings("serial")
   @InputPortFieldAnnotation(optional=true)
   public DefaultInputPortSerializable<ContentEvent> inputPort4 = new DefaultInputPortSerializable<ContentEvent>() {
     @Override

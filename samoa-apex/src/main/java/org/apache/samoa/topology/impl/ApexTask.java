@@ -11,6 +11,7 @@ import org.jboss.netty.channel.socket.DatagramChannelConfig;
 
 import com.datatorrent.api.Attribute;
 import com.datatorrent.api.Attribute.AttributeMap;
+import com.datatorrent.api.Context;
 import com.datatorrent.api.Context.DAGContext;
 import com.datatorrent.api.DAG;
 import com.datatorrent.api.DefaultInputPort;
@@ -65,6 +66,9 @@ public class ApexTask implements StreamingApplication {
 		// Reconstruct Dag
     for(OperatorMeta o: this.dag.getAllOperators()){
       dag.addOperator(o.getName(), o.getOperator());
+      for(Entry<Attribute<?>, Object> attr: o.getAttributes().entrySet()) {
+        dag.setAttribute(o.getOperator(), (Attribute)attr.getKey(), attr.getValue());
+      }
     }
     for(StreamMeta s: this.dag.getAllStreams()) {
       if(loopStreams.contains(s)) {
@@ -83,6 +87,7 @@ public class ApexTask implements StreamingApplication {
     }
 
     dag.setAttribute(DAGContext.STREAMING_WINDOW_SIZE_MILLIS, 50);
+    System.out.println(dag.getAttributes());
 	}
 
 	public void detectLoops(DAG dag, Configuration conf) {

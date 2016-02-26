@@ -36,22 +36,12 @@ import org.apache.samoa.topology.ProcessingItem;
 import org.apache.samoa.topology.Stream;
 import org.apache.samoa.utils.PartitioningScheme;
 
-/**
- * ProcessingItem implementation for Storm.
- * 
- * @author Arinto Murdopo
- * 
- */
 class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyNode {
 	private final ApexOperator operator;
 	private DAG dag;
 	private int numStreams;
 	private int numPartitions = 1;
 	
-	// TODO: should we put parallelism hint here?
-	// imo, parallelism hint only declared when we add this PI in the topology
-	// open for dicussion :p
-
 	// Constructor
 	ApexProcessingItem(Processor processor, int parallelismHint) {
 		this(processor, UUID.randomUUID().toString(), parallelismHint);
@@ -66,7 +56,6 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 	ApexProcessingItem(Processor processor, String friendlyId, int parallelismHint) {
 		super(processor, parallelismHint);
 		this.operator = new ApexOperator(processor, parallelismHint);
-		this.operator.setName(getName());
 		this.setName(friendlyId);
 		this.numPartitions = parallelismHint;
 	}
