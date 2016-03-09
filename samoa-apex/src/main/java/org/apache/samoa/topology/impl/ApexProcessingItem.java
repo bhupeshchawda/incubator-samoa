@@ -97,7 +97,9 @@ class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyN
 		DAG dag = topology.getDAG();
 		this.dag = dag;
 		this.operator.instances = parallelismHint;
-		dag.addOperator(this.getName(), this.operator);
+		String fqcn = this.getName();
+		String[] components = fqcn.split("\\.");
+		dag.addOperator(components[components.length-1], this.operator);
 	}
 
 	@Override

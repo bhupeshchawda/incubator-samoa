@@ -56,7 +56,7 @@ public class Bagging implements ClassificationLearner, Configurable {
 
   /** The ensemble size option. */
   public IntOption ensembleSizeOption = new IntOption("ensembleSize", 's',
-      "The number of models in the bag.", 2, 1, 5);
+      "The number of models in the bag.", 1, 1, 5);
 
   /** The distributor processor. */
   private BaggingDistributorProcessor distributorP;

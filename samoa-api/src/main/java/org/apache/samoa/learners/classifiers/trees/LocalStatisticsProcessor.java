@@ -65,7 +65,7 @@ final class LocalStatisticsProcessor implements Processor {
   private final boolean binarySplit;
   private final AttributeClassObserver nominalClassObserver;
   private final AttributeClassObserver numericClassObserver;
-
+  private int i = 0;
   public LocalStatisticsProcessor()
   {
     splitCriterion = null;
@@ -85,7 +85,7 @@ final class LocalStatisticsProcessor implements Processor {
   public boolean process(ContentEvent event) {
     // process AttributeContentEvent by updating the subset of local statistics
     if (event instanceof AttributeBatchContentEvent) {
-      System.out.println("AttributeBatchContentEvent");
+      System.out.println("AttributeBatchContentEvent " + i++ + "");
       AttributeBatchContentEvent abce = (AttributeBatchContentEvent) event;
       List<ContentEvent> contentEventList = abce.getContentEventList();
       for (ContentEvent contentEvent : contentEventList) {

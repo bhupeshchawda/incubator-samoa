@@ -86,7 +86,7 @@ public class ApexTask implements StreamingApplication {
       }
     }
 
-    dag.setAttribute(DAGContext.STREAMING_WINDOW_SIZE_MILLIS, 50);
+    dag.setAttribute(DAGContext.STREAMING_WINDOW_SIZE_MILLIS, 100);
     System.out.println(dag.getAttributes());
 	}
 

@@ -23,16 +23,12 @@ package org.apache.samoa.moa.classifiers.core.conditionaltests;
 import org.apache.samoa.instances.Instance;
 import org.apache.samoa.instances.InstancesHeader;
 
-import com.esotericsoftware.kryo.DefaultSerializer;
-import com.esotericsoftware.kryo.serializers.JavaSerializer;
-
 /**
  * Numeric binary conditional test for instances to use to split nodes in Hoeffding trees.
  * 
  * @author Richard Kirkby (rkirkby@cs.waikato.ac.nz)
  * @version $Revision: 7 $
  */
-@DefaultSerializer(JavaSerializer.class)
 public class NumericAttributeBinaryTest extends InstanceConditionalBinaryTest {
 
   private static final long serialVersionUID = 1L;
@@ -42,6 +38,9 @@ public class NumericAttributeBinaryTest extends InstanceConditionalBinaryTest {
   protected double attValue;
 
   protected boolean equalsPassesTest;
+
+  public NumericAttributeBinaryTest(){
+  }
 
   public NumericAttributeBinaryTest(int attIndex, double attValue,
       boolean equalsPassesTest) {

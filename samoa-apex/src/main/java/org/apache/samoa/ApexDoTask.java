@@ -50,7 +50,8 @@ public class ApexDoTask
 
     try {
       Configuration config = new Configuration();
-      
+      config.set("dt.loggers.level","com.datatorrent.*:DEBUG");
+
 
       AppFactory appFactory = new StramAppLauncher.AppFactory()
       {

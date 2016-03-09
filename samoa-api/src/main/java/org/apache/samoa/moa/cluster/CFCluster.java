@@ -72,6 +72,9 @@ public abstract class CFCluster extends SphereCluster {
    */
   public double[] SS;
 
+  public CFCluster(){
+    
+  }
   /**
    * Instantiates an empty kernel with the given dimensionality.
    * 
