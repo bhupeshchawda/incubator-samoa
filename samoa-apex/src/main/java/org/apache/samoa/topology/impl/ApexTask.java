@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.samoa.ApexDoTask;
 import org.apache.samoa.core.ContentEvent;
 import org.jboss.netty.channel.socket.DatagramChannelConfig;
 
@@ -39,14 +40,25 @@ public class ApexTask implements StreamingApplication {
 	LogicalPlan dag;
   List<OperatorMeta> visited = Lists.newArrayList();
   Set<StreamMeta> loopStreams = Sets.newHashSet();
+  boolean localMode = false;
 
-	public ApexTask(ApexTopology apexTopo) {
-		this.dag = (LogicalPlan) apexTopo.getDAG();
-	}
+
+  public ApexTask() {
+
+  }
+
+  public ApexTask(ApexTopology apexTopo) {
+    this.dag = (LogicalPlan) apexTopo.getDAG();
+    localMode = true;
+  }
 
 	@SuppressWarnings("unchecked")
   @Override
 	public void populateDAG(DAG dag, Configuration conf) {
+	  if(!localMode) {
+	    ApexTopology topology = ApexDoTask.getTopology();
+	    this.dag = (LogicalPlan) topology.getDAG();
+	  }
 
 	  conf.set("dt.loggers.level","com.datatorrent.*:DEBUG");
     LogicalPlan dag2 = new LogicalPlan();
