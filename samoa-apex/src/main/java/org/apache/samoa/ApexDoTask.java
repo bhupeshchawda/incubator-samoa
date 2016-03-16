@@ -52,7 +52,7 @@ public class ApexDoTask
   
   public static void launch() {
     try {
-      String launchCommand = "launch -force target/samoa-apex-0.4.0-incubating-SNAPSHOT.apa";
+      String launchCommand = "launch -force target/samoa-apex*.apa";
       ExternalHelper.execute(launchCommand);
     } catch (Exception e1) {
       e1.printStackTrace();
