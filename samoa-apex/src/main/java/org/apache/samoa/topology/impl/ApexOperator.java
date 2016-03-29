@@ -16,7 +16,7 @@ public class ApexOperator extends BaseOperator implements Serializable {
   private static final long serialVersionUID = -6637673741263199198L;
   public final Processor processor;
   public int instances = 1; // Default
-  
+
   public boolean[] usedInputPorts = new boolean[]{false, false, false, false, false};
   public boolean[] usedOutputPorts = new boolean[]{false, false, false, false, false};
 

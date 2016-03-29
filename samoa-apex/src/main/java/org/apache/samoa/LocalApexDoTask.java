@@ -62,6 +62,7 @@ public class LocalApexDoTask {
 
 	    LocalMode lma = LocalMode.newInstance();
 	    Configuration conf = new Configuration(false);
+	    conf.set("dt.loggers.level","com.datatorrent.*:DEBUG");
 
 	    try {
 			lma.prepareDAG(new ApexTask(apexTopo), conf);

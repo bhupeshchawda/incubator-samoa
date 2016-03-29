@@ -23,6 +23,7 @@ package org.apache.samoa.learners.classifiers.trees;
 import static org.apache.samoa.moa.core.Utils.maxIndex;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -117,6 +118,7 @@ final class ModelAggregatorProcessor implements Processor {
   @Override
   public boolean process(ContentEvent event) {
 
+    System.out.println("Polling and processing");
     // Poll the blocking queue shared between ModelAggregator and the time-out
     // threads
     Long timedOutSplitId = timedOutSplittingNodes.poll();
@@ -129,9 +131,11 @@ final class ModelAggregatorProcessor implements Processor {
       }
 
     }
+    System.out.println("Done polling and processing");
 
     // Receive a new instance from source
     if (event instanceof InstancesContentEvent) {
+      System.out.println("Processing Instance");
       InstancesContentEvent instancesEvent = (InstancesContentEvent) event;
       this.processInstanceContentEvent(instancesEvent);
       // Send information to local-statistic PI
@@ -158,7 +162,9 @@ final class ModelAggregatorProcessor implements Processor {
         }
       }
       this.foundNodeSet = null;
+      System.out.println("Done Instance");
     } else if (event instanceof LocalResultContentEvent) {
+      System.out.println("Processing LocalResult " + ((LocalResultContentEvent)event).getBestSuggestion().merit);
       LocalResultContentEvent lrce = (LocalResultContentEvent) event;
       Long lrceSplitId = lrce.getSplitId();
       SplittingNodeInfo splittingNodeInfo = splittingNodes.get(lrceSplitId);
@@ -176,6 +182,7 @@ final class ModelAggregatorProcessor implements Processor {
           this.continueAttemptToSplit(activeLearningNode, splittingNodeInfo.foundNode);
         }
       }
+      System.out.println("Done LocalResult");
     }
     return false;
   }

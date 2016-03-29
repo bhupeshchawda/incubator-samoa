@@ -78,6 +78,7 @@ public class ApexTask implements StreamingApplication {
 		// Reconstruct Dag
     for(OperatorMeta o: this.dag.getAllOperators()){
       dag.addOperator(o.getName(), o.getOperator());
+      System.out.println("Added Operator: " + o.getName());
       for(Entry<Attribute<?>, Object> attr: o.getAttributes().entrySet()) {
         dag.setAttribute(o.getOperator(), (Attribute)attr.getKey(), attr.getValue());
       }
