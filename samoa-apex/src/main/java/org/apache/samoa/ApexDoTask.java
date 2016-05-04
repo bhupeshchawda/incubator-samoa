@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 
-import com.datatorrent.stram.cli.DTCli.ExternalHelper;
+import com.datatorrent.stram.cli.ApexCli.ExternalHelper;
 import com.datatorrent.stram.client.StramAppLauncher;
 import com.datatorrent.stram.client.StramAppLauncher.AppFactory;
 import com.datatorrent.stram.plan.logical.LogicalPlan;
