@@ -24,7 +24,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- change this if you desire to use a different version of DataTorrent -->
-    <apex.version>3.4.0-incubating-SNAPSHOT</apex.version>
+    <apex.version>3.4.0-SNAPSHOT</apex.version>
     <apex.apppackage.classpath>lib/*.jar</apex.apppackage.classpath>
   </properties>
 
@@ -96,7 +96,7 @@
 	<dependency>
 		<groupId>org.apache.apex</groupId>
 		<artifactId>apex-engine</artifactId>
-		<version>3.4.0-incubating-SNAPSHOT</version>
+		<version>3.4.0-SNAPSHOT</version>
 	</dependency>
         <dependency>
             <groupId>com.esotericsoftware.kryo</groupId>
