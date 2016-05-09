@@ -19,17 +19,10 @@ package org.apache.samoa;
  * limitations under the License.
  * #L%
  */
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.hadoop.conf.Configuration;
 
-import com.datatorrent.stram.cli.ApexCli.ExternalHelper;
+import com.datatorrent.api.StreamingApplication;
 import com.datatorrent.stram.client.StramAppLauncher;
-import com.datatorrent.stram.client.StramAppLauncher.AppFactory;
-import com.datatorrent.stram.plan.logical.LogicalPlan;
-import com.datatorrent.stram.plan.logical.LogicalPlanConfiguration;
 import org.apache.samoa.topology.impl.ApexSamoaUtils;
 import org.apache.samoa.topology.impl.ApexTask;
 import org.apache.samoa.topology.impl.ApexTopology;
@@ -47,18 +40,43 @@ public class ApexDoTask
   public static void main(String[] args)
   {
     apexTopo = ApexSamoaUtils.argsToTopology(args);
-    launch();
-  }
-  
-  public static void launch() {
     try {
-      String launchCommand = "launch -force target/samoa-apex*.apa SAMOA-on-Apache-Apex";
-      ExternalHelper.execute(launchCommand);
-    } catch (Exception e1) {
-      e1.printStackTrace();
+      startLaunch();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
   
+//  public static void launch() {
+//    try {
+//      String launchCommand = "launch -force target/samoa-apex*.apa SAMOA-on-Apache-Apex";
+//      ExternalHelper.execute(launchCommand);
+//    } catch (Exception e1) {
+//      e1.printStackTrace();
+//    }
+//  }
+
+  public static void startLaunch() throws Exception
+  {
+    ApexTask streamingApp = new ApexTask(apexTopo);
+    streamingApp.setLocalMode(true);
+    launch(streamingApp, "Apex App");
+  }
+
+  public static void launch(StreamingApplication app, String name, String libjars) throws Exception {
+    Configuration conf = new Configuration(true);
+    if (libjars != null) {
+        conf.set(StramAppLauncher.LIBJARS_CONF_KEY_NAME, libjars);
+    }
+    StramAppLauncher appLauncher = new StramAppLauncher(name, conf);
+    appLauncher.loadDependencies();
+    StreamingAppFactory appFactory = new StreamingAppFactory(app, name);
+    appLauncher.launchApp(appFactory);
+    }
+
+  public static void launch(StreamingApplication app, String name) throws Exception {
+    launch(app, name, null);
+  }
   public static ApexTopology getTopology(){
     return apexTopo;
   }

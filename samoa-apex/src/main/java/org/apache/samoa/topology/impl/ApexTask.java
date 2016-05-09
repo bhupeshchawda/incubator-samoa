@@ -42,14 +42,8 @@ public class ApexTask implements StreamingApplication {
   Set<StreamMeta> loopStreams = Sets.newHashSet();
   boolean localMode = false;
 
-
-  public ApexTask() {
-
-  }
-
   public ApexTask(ApexTopology apexTopo) {
     this.dag = (LogicalPlan) apexTopo.getDAG();
-    localMode = true;
   }
 
 	@SuppressWarnings("unchecked")
@@ -134,4 +128,15 @@ public class ApexTask implements StreamingApplication {
       }
     }
 	}
+
+  public void setLocalMode(boolean localMode)
+  {
+    this.localMode = localMode;
+  }
+
+  public boolean isLocalMode()
+  {
+    return localMode;
+  }
+
 }
