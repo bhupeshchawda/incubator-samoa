@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 ###
 # #%L
@@ -346,40 +346,43 @@ elif [ $PLATFORM = 'FLINK' ]; then
 
 elif [ $PLATFORM = 'APEX' ]; then
 
-    echo "Deploying to $PLATFORM"
-    if [ -z $APEX_HOME ];then
-        echo "APEX_HOME is not set!"
-        echo "Please set APEX_HOME to point to your Apex installation or top level source directory"
-        exit -1
-    fi
-
     if [ ! -f $2 ];then
         echo "$2 does not exist!"
         echo "Please use a valid jar file for Apex execution"
         exit -1
     fi
 
-    APEX_EXEC="$APEX_HOME/engine/src/main/scripts/dtcli"
+    VALUE=""
+    getvalue()
+    {
+        VALUE=`sed '/^\#/d' $BASE_DIR/$SAMOA_APEX_PROPERTIES | grep "$1" | tail -n 1 | cut -d "=" -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'`
+    }
 
     SAMOA_APEX_PROPERTIES="samoa-apex.properties"
     MODE_OPTION="samoa.apex.mode"
+    DT_DFS_DIR_OPTION="dt.dfsRootDirectory"
+    getvalue "$DT_DFS_DIR_OPTION"
+    DT_DFS_DIR="$VALUE"
+    DEFAULT_FS_OPTION="fs.default.name"
+    getvalue "$DEFAULT_FS_OPTION"
+    DEFAULT_FS="$VALUE"
 
-    VALUE=""
-    getvalue()
-        {
-        VALUE=`sed '/^\#/d' $BASE_DIR/$SAMOA_APEX_PROPERTIES | grep "$1" | tail -n 1 | cut -d "=" -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'`
-        }
-    
     getvalue "$MODE_OPTION"
     MODE_ARG="$VALUE"
 
     DEPLOYABLE=$JAR_PATH
     echo "Deployable: " $DEPLOYABLE
     if [ "$MODE_ARG" = "cluster" ]; then
-        echo "launch $DEPLOYABLE"
-        echo "launch $DEPLOYABLE" | $APEX_EXEC
-    elif [ "$MODE_ARG" = "local" ]; then
-        echo "launch -local $DEPLOYABLE" | $APEX_EXEC
+        CMD="java -cp .:$DEPLOYABLE -D$DT_DFS_DIR_OPTION=$DT_DFS_DIR -D$DEFAULT_FS_OPTION=$DEFAULT_FS org.apache.samoa.ApexDoTask ${OPTIONS}"
+        echo Command: $CMD
+        ${CMD}
+    elif [ "$MODE_ARG" = "local" ]
+    then
+        CMD="java -cp .:$DEPLOYABLE -D$DT_DFS_DIR_OPTION=$DT_DFS_DIR -D$DEFAULT_FS_OPTION=$DEFAULT_FS org.apache.samoa.LocalApexDoTask ${OPTIONS}"
+        echo Command: $CMD
+        ${CMD}
+    else
+        echo "Wrong mode argument. Check property samoa.apex.mode in samoa-apex.properties file"
     fi
 
 elif [ $PLATFORM = 'THREADS' ]; then

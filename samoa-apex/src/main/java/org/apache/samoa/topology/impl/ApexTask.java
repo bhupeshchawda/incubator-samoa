@@ -54,27 +54,23 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-@ApplicationAnnotation(name="SAMOA-on-Apache-Apex")
 public class ApexTask implements StreamingApplication {
 
 	LogicalPlan dag;
+	String appName = "SAMOA-Apex-Application";
   List<OperatorMeta> visited = Lists.newArrayList();
   Set<StreamMeta> loopStreams = Sets.newHashSet();
   boolean localMode = false;
 
   public ApexTask(ApexTopology apexTopo) {
     this.dag = (LogicalPlan) apexTopo.getDAG();
+    appName = apexTopo.getTopologyName();
   }
 
 	@SuppressWarnings("unchecked")
   @Override
 	public void populateDAG(DAG dag, Configuration conf) {
-	  if(!localMode) {
-	    ApexTopology topology = ApexDoTask.getTopology();
-	    this.dag = (LogicalPlan) topology.getDAG();
-	  }
 
-	  conf.set("dt.loggers.level","com.datatorrent.*:DEBUG");
     LogicalPlan dag2 = new LogicalPlan();
     for(OperatorMeta o: this.dag.getAllOperators()){
 			dag2.addOperator(o.getName(), o.getOperator());
@@ -115,6 +111,7 @@ public class ApexTask implements StreamingApplication {
 
 //    dag.setAttribute(DAGContext.STREAMING_WINDOW_SIZE_MILLIS, 100);
     System.out.println(dag.getAttributes());
+    dag.setAttribute(Context.DAGContext.APPLICATION_NAME, appName);
 	}
 
 	public void detectLoops(DAG dag, Configuration conf) {

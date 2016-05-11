@@ -139,10 +139,6 @@
                             <Implementation-Vendor>Datatorrent</Implementation-Vendor>
                             <Implementation-Vendor-Id>SAMOA</Implementation-Vendor-Id>
                         </manifestEntries>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>org.apache.samoa.ApexDoTask</mainClass>
-                        </manifest>
                     </archive>
                 </configuration>
                 <executions>

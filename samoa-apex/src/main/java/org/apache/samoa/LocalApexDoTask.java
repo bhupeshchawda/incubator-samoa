@@ -76,11 +76,11 @@ public class LocalApexDoTask {
 	    lc.setHeartbeatMonitoringEnabled(false);
 
 	    lc.runAsync();
-	    try {
-        Thread.sleep(100000);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-	    lc.shutdown();
+//	    try {
+//        Thread.sleep(100000);
+//      } catch (InterruptedException e) {
+//        e.printStackTrace();
+//      }
+//	    lc.shutdown();
 	}
 }
