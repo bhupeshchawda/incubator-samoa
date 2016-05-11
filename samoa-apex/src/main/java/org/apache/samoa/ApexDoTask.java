@@ -1,5 +1,7 @@
 package org.apache.samoa;
 
+import java.io.File;
+
 /*
  * #%L
  * SAMOA
@@ -65,6 +67,11 @@ public class ApexDoTask
 
   public static void launch(StreamingApplication app, String name, String libjars) throws Exception {
     Configuration conf = new Configuration(true);
+    conf.set("dt.loggers.level","org.apache.*:DEBUG");
+
+//    conf.addResource(new File("/home/bhupesh/.dt/dt-site.xml").toURI().toURL());
+    conf.set("dt.dfsRootDirectory", "/user/bhupesh/datatorrent/");
+    conf.set("fs.default.name", "hdfs://localhost:9000");
     if (libjars != null) {
         conf.set(StramAppLauncher.LIBJARS_CONF_KEY_NAME, libjars);
     }
