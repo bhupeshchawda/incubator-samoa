@@ -34,17 +34,13 @@ import com.esotericsoftware.kryo.serializers.JavaSerializer;
 @DefaultSerializer(JavaSerializer.class)
 public class ApexInputOperator extends BaseOperator implements InputOperator, Serializable {
 
-  /**
-   * 
-   */
   private static final long NUM_TUPLES_IN_WINDOW = 1000;
   private static final long serialVersionUID = 4255026962166445721L;
   private final EntranceProcessor entranceProcessor;
   private final DefaultOutputPortSerializable<ContentEvent> outputPort = new DefaultOutputPortSerializable<ContentEvent>();
   private int numTuples;
 
-  public ApexInputOperator()
-  {
+  public ApexInputOperator() {
     entranceProcessor = null;
   }
 
@@ -64,15 +60,14 @@ public class ApexInputOperator extends BaseOperator implements InputOperator, Se
   }
 
   @Override
-  public void beginWindow(long windowId)
-  {
+  public void beginWindow(long windowId) {
     super.beginWindow(windowId);
     numTuples = 0;
   }
 
   @Override
   public void emitTuples() {
-    if(entranceProcessor.hasNext() && numTuples < NUM_TUPLES_IN_WINDOW){
+    if (entranceProcessor.hasNext() && numTuples < NUM_TUPLES_IN_WINDOW) {
       outputPort.emit(entranceProcessor.nextEvent());
       numTuples++;
     }

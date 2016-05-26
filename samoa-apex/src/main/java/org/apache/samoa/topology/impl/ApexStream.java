@@ -22,51 +22,38 @@ package org.apache.samoa.topology.impl;
 
 import com.datatorrent.api.DefaultInputPort;
 import com.datatorrent.api.DefaultOutputPort;
-import com.datatorrent.stram.plan.logical.LogicalPlan;
-import com.datatorrent.stram.plan.logical.LogicalPlan.OutputPortMeta;
-import com.datatorrent.stram.plan.logical.LogicalPlan.StreamMeta;
 import com.esotericsoftware.kryo.DefaultSerializer;
-import com.esotericsoftware.kryo.serializers.DefaultSerializers.KryoSerializableSerializer;
-import com.esotericsoftware.kryo.serializers.FieldSerializer.Bind;
 import com.esotericsoftware.kryo.serializers.JavaSerializer;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.topology.AbstractStream;
 
-/**
- * Storm Stream that connects into Bolt. It wraps Storm's outputCollector class
- * 
- * @author Arinto Murdopo
- * 
- */
 @DefaultSerializer(JavaSerializer.class)
-class ApexStream extends AbstractStream implements Serializable {
+public class ApexStream extends AbstractStream implements Serializable {
 
-	private static final long serialVersionUID = -5712513402991550847L;
+  private static final long serialVersionUID = -5712513402991550847L;
 
-	private String streamId = "";
-	private UUID id;
-	public DefaultInputPort<ContentEvent> inputPort;
-	public DefaultOutputPort<ContentEvent> outputPort;
+  private String streamId = "";
+  public DefaultInputPort<ContentEvent> inputPort;
+  public DefaultOutputPort<ContentEvent> outputPort;
 
   public ApexStream(String id) {
     streamId = id;
-    this.id = UUID.randomUUID();
   }
-	
-	@Override
-	public void put(ContentEvent contentEvent) {
-	  outputPort.emit(contentEvent);
-	}
 
-	@Override
-	public String getStreamId() {
-		return streamId;
-	}
+  @Override
+  public void put(ContentEvent contentEvent) {
+    outputPort.emit(contentEvent);
+  }
 
-	@Override
-	public void setBatchSize(int batchsize) {}
+  @Override
+  public String getStreamId() {
+    return streamId;
+  }
+
+  @Override
+  public void setBatchSize(int batchsize) {
+  }
 }

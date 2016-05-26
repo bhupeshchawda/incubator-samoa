@@ -1,6 +1,5 @@
 package org.apache.samoa.topology.impl;
 
-
 /*
  * #%L
  * SAMOA
@@ -36,117 +35,113 @@ import org.apache.samoa.topology.ProcessingItem;
 import org.apache.samoa.topology.Stream;
 import org.apache.samoa.utils.PartitioningScheme;
 
-class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyNode {
-	private final ApexOperator operator;
-	private DAG dag;
-	private int numStreams;
-	private int numPartitions = 1;
-	
-	// Constructor
-	ApexProcessingItem(Processor processor, int parallelismHint) {
-		this(processor, UUID.randomUUID().toString(), parallelismHint);
-	}
+public class ApexProcessingItem extends AbstractProcessingItem implements ApexTopologyNode {
 
-	public ApexProcessingItem()
-  {
-	  operator = null;
+  private final ApexOperator operator;
+  private DAG dag;
+  private int numStreams;
+  private int numPartitions = 1;
+
+  // Constructor
+  ApexProcessingItem(Processor processor, int parallelismHint) {
+    this(processor, UUID.randomUUID().toString(), parallelismHint);
   }
 
-	// Constructor
-	ApexProcessingItem(Processor processor, String friendlyId, int parallelismHint) {
-		super(processor, parallelismHint);
-		this.operator = new ApexOperator(processor, parallelismHint);
-		this.setName(friendlyId);
-		this.numPartitions = parallelismHint;
-	}
-	
-	@Override
-	protected ProcessingItem addInputStream(Stream inputStream, PartitioningScheme scheme) {
-		ApexStream apexStream = (ApexStream) inputStream;
-		this.operator.addInputStream(apexStream);
-		dag.addStream(apexStream.getStreamId(), apexStream.outputPort, apexStream.inputPort);
+  public ApexProcessingItem() {
+    operator = null;
+  }
+
+  // Constructor
+  ApexProcessingItem(Processor processor, String friendlyId, int parallelismHint) {
+    super(processor, parallelismHint);
+    this.operator = new ApexOperator(processor, parallelismHint);
+    this.setName(friendlyId);
+    this.numPartitions = parallelismHint;
+  }
+
+  @Override
+  protected ProcessingItem addInputStream(Stream inputStream, PartitioningScheme scheme) {
+    ApexStream apexStream = (ApexStream) inputStream;
+    this.operator.addInputStream(apexStream);
+    dag.addStream(apexStream.getStreamId(), apexStream.outputPort, apexStream.inputPort);
 
     // Setup stream codecs here
-    switch(scheme) {
+    switch (scheme) {
     case SHUFFLE:
-      dag.setInputPortAttribute(apexStream.inputPort, Context.PortContext.STREAM_CODEC, 
-              new StreamUtils.RandomStreamCodec<ContentEvent>());
+      dag.setInputPortAttribute(apexStream.inputPort, Context.PortContext.STREAM_CODEC,
+          new StreamUtils.RandomStreamCodec<ContentEvent>());
       System.out.println("Setting Shuffle mapping on " + apexStream.getStreamId());
       break;
     case BROADCAST:
-      dag.setAttribute(this.operator, Context.OperatorContext.PARTITIONER, new StreamUtils.AllPartitioner<ApexOperator>(numPartitions));
+      dag.setAttribute(this.operator, Context.OperatorContext.PARTITIONER,
+          new StreamUtils.AllPartitioner<ApexOperator>(numPartitions));
       break;
     case GROUP_BY_KEY:
-      dag.setInputPortAttribute(apexStream.inputPort, Context.PortContext.STREAM_CODEC, 
-              new StreamUtils.KeyBasedStreamCodec<ContentEvent>());
+      dag.setInputPortAttribute(apexStream.inputPort, Context.PortContext.STREAM_CODEC,
+          new StreamUtils.KeyBasedStreamCodec<ContentEvent>());
       break;
     default:
       // Should never occur
       throw new RuntimeException("Unknown partitioning scheme");
     }
 
-    if( ! dag.getAttributes().contains(Context.OperatorContext.PARTITIONER)) {
+    if (!dag.getAttributes().contains(Context.OperatorContext.PARTITIONER)) {
       System.out.println("Setting " + this.operator.processor.getClass() + " to " + numPartitions + " instances.");
       dag.setAttribute(this.operator, Context.OperatorContext.PARTITIONER, new StatelessPartitioner<>(numPartitions));
     }
-		return this;
-	}
+    return this;
+  }
 
-	@Override
-	public void addToTopology(ApexTopology topology, int parallelismHint) {
-		DAG dag = topology.getDAG();
-		this.dag = dag;
-		this.operator.instances = parallelismHint;
-		String fqcn = this.getName();
-		String[] components = fqcn.split("\\.");
-		dag.addOperator(components[components.length-1], this.operator);
-	}
+  @Override
+  public void addToTopology(ApexTopology topology, int parallelismHint) {
+    DAG dag = topology.getDAG();
+    this.dag = dag;
+    this.operator.instances = parallelismHint;
+    String fqcn = this.getName();
+    String[] components = fqcn.split("\\.");
+    dag.addOperator(components[components.length - 1], this.operator);
+  }
 
-	@Override
-	public ApexStream createStream() {
-		return operator.createStream("Stream_from_" + this.getName() + "_#" + numStreams++);
-	}
+  @Override
+  public ApexStream createStream() {
+    return operator.createStream("Stream_from_" + this.getName() + "_#" + numStreams++);
+  }
 
-	@Override
-	public String getId() {
-		return this.getName();
-	}
+  @Override
+  public String getId() {
+    return this.getName();
+  }
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder(super.toString());
-		sb.insert(0, String.format("id: %s, ", this.getName()));
-		return sb.toString();
-	}
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(super.toString());
+    sb.insert(0, String.format("id: %s, ", this.getName()));
+    return sb.toString();
+  }
 
-  public static class RandomStreamCodec extends DefaultStatefulStreamCodec<ContentEvent>
-  {
+  public static class RandomStreamCodec extends DefaultStatefulStreamCodec<ContentEvent> {
     Random r;
-    public RandomStreamCodec()
-    {
+
+    public RandomStreamCodec() {
       r = new Random();
     }
+
     @Override
-    public int getPartition(ContentEvent tuple)
-    {
+    public int getPartition(ContentEvent tuple) {
       return r.nextInt();
     }
   }
 
-  public static class KeyBasedStreamCodec extends DefaultStatefulStreamCodec<ContentEvent>
-  {
+  public static class KeyBasedStreamCodec extends DefaultStatefulStreamCodec<ContentEvent> {
     @Override
-    public int getPartition(ContentEvent tuple)
-    {
+    public int getPartition(ContentEvent tuple) {
       return tuple.getKey().hashCode();
     }
   }
 
-  public static class AllStreamCodec extends DefaultStatefulStreamCodec<ContentEvent>
-  {
+  public static class AllStreamCodec extends DefaultStatefulStreamCodec<ContentEvent> {
     @Override
-    public int getPartition(ContentEvent tuple)
-    {
+    public int getPartition(ContentEvent tuple) {
       return tuple.getKey().hashCode();
     }
   }

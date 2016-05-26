@@ -25,14 +25,12 @@ import org.junit.Test;
 
 import com.datatorrent.api.LocalMode;
 
-public class IterationTest
-{
+public class IterationTest {
   @Test
-  public void testIteration()
-  {
+  public void testIteration() {
     LocalMode lma = LocalMode.newInstance();
     Configuration conf = new Configuration(false);
-    conf.set("dt.loggers.level","com.datatorrent.*:DEBUG");
+    conf.set("dt.loggers.level", "com.datatorrent.*:DEBUG");
 
     try {
       lma.prepareDAG(new IterationExample(), conf);

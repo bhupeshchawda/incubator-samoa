@@ -1,7 +1,5 @@
 package org.apache.samoa;
 
-import java.io.File;
-
 /*
  * #%L
  * SAMOA
@@ -21,6 +19,7 @@ import java.io.File;
  * limitations under the License.
  * #L%
  */
+
 import org.apache.hadoop.conf.Configuration;
 
 import com.datatorrent.api.StreamingApplication;
@@ -29,18 +28,11 @@ import org.apache.samoa.topology.impl.ApexSamoaUtils;
 import org.apache.samoa.topology.impl.ApexTask;
 import org.apache.samoa.topology.impl.ApexTopology;
 
-public class ApexDoTask
-{
+public class ApexDoTask {
 
   public static ApexTopology apexTopo;
-  /**
-   * The main method.
-   * 
-   * @param args
-   *          the arguments
-   */
-  public static void main(String[] args)
-  {
+
+  public static void main(String[] args) {
     apexTopo = ApexSamoaUtils.argsToTopology(args);
     try {
       startLaunch();
@@ -48,18 +40,8 @@ public class ApexDoTask
       throw new RuntimeException(e);
     }
   }
-  
-//  public static void launch() {
-//    try {
-//      String launchCommand = "launch -force target/samoa-apex*.apa SAMOA-on-Apache-Apex";
-//      ExternalHelper.execute(launchCommand);
-//    } catch (Exception e1) {
-//      e1.printStackTrace();
-//    }
-//  }
 
-  public static void startLaunch() throws Exception
-  {
+  public static void startLaunch() throws Exception {
     ApexTask streamingApp = new ApexTask(apexTopo);
     streamingApp.setLocalMode(true);
     launch(streamingApp, "Apex App");
@@ -67,24 +49,25 @@ public class ApexDoTask
 
   public static void launch(StreamingApplication app, String name, String libjars) throws Exception {
     Configuration conf = new Configuration(true);
-    conf.set("dt.loggers.level","org.apache.*:DEBUG");
+    conf.set("dt.loggers.level", "org.apache.*:DEBUG");
 
-//    conf.addResource(new File("/home/bhupesh/.dt/dt-site.xml").toURI().toURL());
+    //    conf.addResource(new File("/home/bhupesh/.dt/dt-site.xml").toURI().toURL());
     conf.set("dt.dfsRootDirectory", "/user/bhupesh/datatorrent/");
     conf.set("fs.default.name", "hdfs://localhost:9000");
     if (libjars != null) {
-        conf.set(StramAppLauncher.LIBJARS_CONF_KEY_NAME, libjars);
+      conf.set(StramAppLauncher.LIBJARS_CONF_KEY_NAME, libjars);
     }
     StramAppLauncher appLauncher = new StramAppLauncher(name, conf);
     appLauncher.loadDependencies();
     StreamingAppFactory appFactory = new StreamingAppFactory(app, name);
     appLauncher.launchApp(appFactory);
-    }
+  }
 
   public static void launch(StreamingApplication app, String name) throws Exception {
     launch(app, name, null);
   }
-  public static ApexTopology getTopology(){
+
+  public static ApexTopology getTopology() {
     return apexTopo;
   }
 

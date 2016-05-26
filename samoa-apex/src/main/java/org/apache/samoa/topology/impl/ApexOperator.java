@@ -37,16 +37,15 @@ public class ApexOperator extends BaseOperator implements Serializable {
   public final Processor processor;
   public int instances = 1; // Default
 
-  public boolean[] usedInputPorts = new boolean[]{false, false, false, false, false};
-  public boolean[] usedOutputPorts = new boolean[]{false, false, false, false, false};
+  public boolean[] usedInputPorts = new boolean[] { false, false, false, false, false };
+  public boolean[] usedOutputPorts = new boolean[] { false, false, false, false, false };
 
-  public ApexOperator()
-  {
+  public ApexOperator() {
     processor = null;
   }
 
   @SuppressWarnings("serial")
-  @InputPortFieldAnnotation(optional=true)
+  @InputPortFieldAnnotation(optional = true)
   public DefaultInputPortSerializable<ContentEvent> inputPort0 = new DefaultInputPortSerializable<ContentEvent>() {
     @Override
     public void process(ContentEvent tuple) {
@@ -54,7 +53,7 @@ public class ApexOperator extends BaseOperator implements Serializable {
     }
   };
   @SuppressWarnings("serial")
-  @InputPortFieldAnnotation(optional=true)
+  @InputPortFieldAnnotation(optional = true)
   public DefaultInputPortSerializable<ContentEvent> inputPort1 = new DefaultInputPortSerializable<ContentEvent>() {
     @Override
     public void process(ContentEvent tuple) {
@@ -62,7 +61,7 @@ public class ApexOperator extends BaseOperator implements Serializable {
     }
   };
   @SuppressWarnings("serial")
-  @InputPortFieldAnnotation(optional=true)
+  @InputPortFieldAnnotation(optional = true)
   public DefaultInputPortSerializable<ContentEvent> inputPort2 = new DefaultInputPortSerializable<ContentEvent>() {
     @Override
     public void process(ContentEvent tuple) {
@@ -70,7 +69,7 @@ public class ApexOperator extends BaseOperator implements Serializable {
     }
   };
   @SuppressWarnings("serial")
-  @InputPortFieldAnnotation(optional=true)
+  @InputPortFieldAnnotation(optional = true)
   public DefaultInputPortSerializable<ContentEvent> inputPort3 = new DefaultInputPortSerializable<ContentEvent>() {
     @Override
     public void process(ContentEvent tuple) {
@@ -78,7 +77,7 @@ public class ApexOperator extends BaseOperator implements Serializable {
     }
   };
   @SuppressWarnings("serial")
-  @InputPortFieldAnnotation(optional=true)
+  @InputPortFieldAnnotation(optional = true)
   public DefaultInputPortSerializable<ContentEvent> inputPort4 = new DefaultInputPortSerializable<ContentEvent>() {
     @Override
     public void process(ContentEvent tuple) {
@@ -86,78 +85,67 @@ public class ApexOperator extends BaseOperator implements Serializable {
     }
   };
 
-  @OutputPortFieldAnnotation(optional=true)
+  @OutputPortFieldAnnotation(optional = true)
   public DefaultOutputPortSerializable<ContentEvent> outputPort0 = new DefaultOutputPortSerializable<ContentEvent>();
-  @OutputPortFieldAnnotation(optional=true)
+  @OutputPortFieldAnnotation(optional = true)
   public DefaultOutputPortSerializable<ContentEvent> outputPort1 = new DefaultOutputPortSerializable<ContentEvent>();
-  @OutputPortFieldAnnotation(optional=true)
+  @OutputPortFieldAnnotation(optional = true)
   public DefaultOutputPortSerializable<ContentEvent> outputPort2 = new DefaultOutputPortSerializable<ContentEvent>();
-  @OutputPortFieldAnnotation(optional=true)
+  @OutputPortFieldAnnotation(optional = true)
   public DefaultOutputPortSerializable<ContentEvent> outputPort3 = new DefaultOutputPortSerializable<ContentEvent>();
-  @OutputPortFieldAnnotation(optional=true)
+  @OutputPortFieldAnnotation(optional = true)
   public DefaultOutputPortSerializable<ContentEvent> outputPort4 = new DefaultOutputPortSerializable<ContentEvent>();
 
   ApexOperator(Processor processor, int parallelismHint) {
     this.processor = processor;
     this.instances = parallelismHint;
   }
-  
+
   @Override
-  public void setup(OperatorContext context)
-  {
+  public void setup(OperatorContext context) {
     processor.onCreate(context.getId());
   }
-  
+
   public ApexStream createStream(String id) {
     ApexStream stream = new ApexStream(id);
-    if(!usedOutputPorts[0]) {
+    if (!usedOutputPorts[0]) {
       stream.outputPort = outputPort0;
       usedOutputPorts[0] = true;
-    }
-    else if(!usedOutputPorts[1]) {
+    } else if (!usedOutputPorts[1]) {
       stream.outputPort = outputPort1;
       usedOutputPorts[1] = true;
-    }
-    else if(!usedOutputPorts[2]) {
+    } else if (!usedOutputPorts[2]) {
       stream.outputPort = outputPort2;
       usedOutputPorts[2] = true;
-    }
-    else if(!usedOutputPorts[3]) {
+    } else if (!usedOutputPorts[3]) {
       stream.outputPort = outputPort3;
       usedOutputPorts[3] = true;
-    }
-    else if(!usedOutputPorts[4]) {
+    } else if (!usedOutputPorts[4]) {
       stream.outputPort = outputPort4;
       usedOutputPorts[4] = true;
-    }
-    else {
+    } else {
       throw new RuntimeException("Need more input ports for ApexOperator");
     }
     return stream;
   }
 
   public void addInputStream(ApexStream stream) {
-    if(!usedInputPorts[0]) {
+    if (!usedInputPorts[0]) {
       stream.inputPort = inputPort0;
       usedInputPorts[0] = true;
-    }
-    else if(!usedInputPorts[1]) {
+    } else if (!usedInputPorts[1]) {
       stream.inputPort = inputPort1;
       usedInputPorts[1] = true;
-    }
-    else if(!usedInputPorts[2]) {
+    } else if (!usedInputPorts[2]) {
       stream.inputPort = inputPort2;
       usedInputPorts[2] = true;
-    }
-    else if(!usedInputPorts[3]) {
+    } else if (!usedInputPorts[3]) {
       stream.inputPort = inputPort3;
       usedInputPorts[3] = true;
-    }
-    else if(!usedInputPorts[4]) {
+    } else if (!usedInputPorts[4]) {
       stream.inputPort = inputPort4;
       usedInputPorts[4] = true;
-    }
-    else {
+    } else {
       throw new RuntimeException("Need more input ports for ApexOperator");
     }
   }

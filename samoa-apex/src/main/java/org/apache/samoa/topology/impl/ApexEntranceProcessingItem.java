@@ -22,69 +22,58 @@ package org.apache.samoa.topology.impl;
 
 import java.util.UUID;
 
-import com.datatorrent.api.DefaultOutputPort;
-import com.datatorrent.api.Context.OperatorContext;
-import com.datatorrent.api.InputOperator;
-import com.datatorrent.common.util.BaseOperator;
-import com.esotericsoftware.kryo.DefaultSerializer;
-import com.esotericsoftware.kryo.serializers.FieldSerializer.Bind;
-import com.esotericsoftware.kryo.serializers.JavaSerializer;
-
-import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.core.EntranceProcessor;
 import org.apache.samoa.topology.AbstractEntranceProcessingItem;
-import org.apache.samoa.topology.EntranceProcessingItem;
-import org.apache.samoa.topology.Stream;
 
 /**
  * EntranceProcessingItem implementation for Storm.
  */
-class ApexEntranceProcessingItem extends AbstractEntranceProcessingItem implements ApexTopologyNode {
-	private final ApexInputOperator inputOperator;
-	private int numStreams;
+public class ApexEntranceProcessingItem extends AbstractEntranceProcessingItem implements ApexTopologyNode {
 
-	public ApexEntranceProcessingItem()
-  {
-	  inputOperator = null;
+  private final ApexInputOperator inputOperator;
+  private int numStreams;
+
+  public ApexEntranceProcessingItem() {
+    inputOperator = null;
   }
 
-	// Constructor
-	ApexEntranceProcessingItem(EntranceProcessor processor) {
-		this(processor, UUID.randomUUID().toString());
-	}
+  // Constructor
+  ApexEntranceProcessingItem(EntranceProcessor processor) {
+    this(processor, UUID.randomUUID().toString());
+  }
 
-	// Constructor
-	ApexEntranceProcessingItem(EntranceProcessor processor, String friendlyId) {
-		super(processor);
-		this.setName(friendlyId);
-		this.inputOperator = new ApexInputOperator(processor);
-	}
+  // Constructor
+  ApexEntranceProcessingItem(EntranceProcessor processor, String friendlyId) {
+    super(processor);
+    this.setName(friendlyId);
+    this.inputOperator = new ApexInputOperator(processor);
+  }
 
-	@Override
-	public void addToTopology(ApexTopology topology, int parallelismHint) {
-		topology.getDAG().addOperator(this.getName(), inputOperator);
-		//add num partitions
-	}
+  @Override
+  public void addToTopology(ApexTopology topology, int parallelismHint) {
+    topology.getDAG().addOperator(this.getName(), inputOperator);
+    //add num partitions
+  }
 
-	@Override
-	public ApexStream createStream() {
-		return inputOperator.createStream("Stream_from_" + this.getName() + "_#" + numStreams++);
-	}
+  @Override
+  public ApexStream createStream() {
+    return inputOperator.createStream("Stream_from_" + this.getName() + "_#" + numStreams++);
+  }
 
-//	@Override
-//	public ApexEntranceProcessingItem setOutputStream(Stream outputStream) {
-//		return setOutputStream(outputStream);
-//	}
-	
-	@Override
-	public String getId() {
-		return this.getName();
-	}
+  //	@Override
+  //	public ApexEntranceProcessingItem setOutputStream(Stream outputStream) {
+  //		return setOutputStream(outputStream);
+  //	}
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder(super.toString());
-		sb.insert(0, String.format("id: %s, ", this.getName()));
-		return sb.toString();
-	}
+  @Override
+  public String getId() {
+    return this.getName();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(super.toString());
+    sb.insert(0, String.format("id: %s, ", this.getName()));
+    return sb.toString();
+  }
 }

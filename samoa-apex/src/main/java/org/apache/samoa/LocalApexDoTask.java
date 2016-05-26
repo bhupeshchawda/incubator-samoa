@@ -19,6 +19,7 @@ package org.apache.samoa;
  * limitations under the License.
  * #L%
  */
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,53 +35,35 @@ import org.apache.samoa.topology.impl.ApexSamoaUtils;
 import org.apache.samoa.topology.impl.ApexTask;
 import org.apache.samoa.topology.impl.ApexTopology;
 
-/**
- * The main class to execute a SAMOA task in LOCAL mode in Storm.
- * 
- * @author Arinto Murdopo
- * 
- */
 public class LocalApexDoTask {
 
-	private static final Logger logger = LoggerFactory.getLogger(LocalApexDoTask.class);
+  private static final Logger logger = LoggerFactory.getLogger(LocalApexDoTask.class);
 
-	/**
-	 * The main method.
-	 * 
-	 * @param args
-	 *          the arguments
-	 */
-	public static void main(String[] args) {
+  public static void main(String[] args) {
 
-	    List<String> tmpArgs = new ArrayList<String>(Arrays.asList(args));
+    List<String> tmpArgs = new ArrayList<String>(Arrays.asList(args));
 
-	    args = tmpArgs.toArray(new String[0]);
+    args = tmpArgs.toArray(new String[0]);
 
-	    // convert the arguments into Storm topology
-	    ApexTopology apexTopo = ApexSamoaUtils.argsToTopology(args);
-	    String topologyName = apexTopo.getTopologyName();
+    // convert the arguments into Storm topology
+    ApexTopology apexTopo = ApexSamoaUtils.argsToTopology(args);
+    String topologyName = apexTopo.getTopologyName();
 
-	    LocalMode lma = LocalMode.newInstance();
-	    Configuration conf = new Configuration(false);
-	    conf.set("dt.loggers.level","com.datatorrent.*:DEBUG");
+    LocalMode lma = LocalMode.newInstance();
+    Configuration conf = new Configuration(false);
+    conf.set("dt.loggers.level", "com.datatorrent.*:DEBUG");
 
-	    try {
-			lma.prepareDAG(new ApexTask(apexTopo), conf);
-			System.out.println("Dag Set in lma: " + lma.getDAG());
-			((LogicalPlan)lma.getDAG()).validate();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	    LocalMode.Controller lc = lma.getController();
-	    lc.setHeartbeatMonitoringEnabled(false);
+    try {
+      lma.prepareDAG(new ApexTask(apexTopo), conf);
+      System.out.println("Dag Set in lma: " + lma.getDAG());
+      ((LogicalPlan) lma.getDAG()).validate();
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    LocalMode.Controller lc = lma.getController();
+    lc.setHeartbeatMonitoringEnabled(false);
 
-	    lc.runAsync();
-//	    try {
-//        Thread.sleep(100000);
-//      } catch (InterruptedException e) {
-//        e.printStackTrace();
-//      }
-//	    lc.shutdown();
-	}
+    lc.runAsync();
+  }
 }

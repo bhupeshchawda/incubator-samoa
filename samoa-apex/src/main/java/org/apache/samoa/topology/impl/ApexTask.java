@@ -21,19 +21,14 @@ package org.apache.samoa.topology.impl;
  */
 
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.samoa.ApexDoTask;
 import org.apache.samoa.core.ContentEvent;
-import org.jboss.netty.channel.socket.DatagramChannelConfig;
 
 import com.datatorrent.api.Attribute;
-import com.datatorrent.api.Attribute.AttributeMap;
 import com.datatorrent.api.Context;
-import com.datatorrent.api.Context.DAGContext;
 import com.datatorrent.api.DAG;
 import com.datatorrent.api.DefaultInputPort;
 import com.datatorrent.api.DefaultOutputPort;
@@ -43,8 +38,6 @@ import com.datatorrent.api.Operator.InputPort;
 import com.datatorrent.api.Operator.OutputPort;
 import com.datatorrent.common.util.DefaultDelayOperator;
 import com.datatorrent.api.StreamingApplication;
-import com.datatorrent.api.annotation.ApplicationAnnotation;
-import com.datatorrent.stram.engine.OperatorContext;
 import com.datatorrent.stram.plan.logical.LogicalPlan;
 import com.datatorrent.stram.plan.logical.LogicalPlan.InputPortMeta;
 import com.datatorrent.stram.plan.logical.LogicalPlan.OperatorMeta;
@@ -56,8 +49,8 @@ import com.google.common.collect.Sets;
 
 public class ApexTask implements StreamingApplication {
 
-	LogicalPlan dag;
-	String appName = "SAMOA-Apex-Application";
+  LogicalPlan dag;
+  String appName = "SAMOA-Apex-Application";
   List<OperatorMeta> visited = Lists.newArrayList();
   Set<StreamMeta> loopStreams = Sets.newHashSet();
   boolean localMode = false;
@@ -67,41 +60,44 @@ public class ApexTask implements StreamingApplication {
     appName = apexTopo.getTopologyName();
   }
 
-	@SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")
   @Override
-	public void populateDAG(DAG dag, Configuration conf) {
+  public void populateDAG(DAG dag, Configuration conf) {
 
     LogicalPlan dag2 = new LogicalPlan();
-    for(OperatorMeta o: this.dag.getAllOperators()){
-			dag2.addOperator(o.getName(), o.getOperator());
-		}
-		for(StreamMeta s: this.dag.getAllStreams()) {
-			for(InputPortMeta i: s.getSinks()) {
-				Operator.OutputPort<Object> op = (OutputPort<Object>) s.getSource().getPortObject();
-				Operator.InputPort<Object> ip = (InputPort<Object>) i.getPortObject();
-				dag2.addStream(s.getName(), op, ip);
-			}
-		}
-
-		detectLoops(dag2, conf);
-		
-		// Reconstruct Dag
-    for(OperatorMeta o: this.dag.getAllOperators()){
-      dag.addOperator(o.getName(), o.getOperator());
-      System.out.println("Added Operator: " + o.getName());
-      for(Entry<Attribute<?>, Object> attr: o.getAttributes().entrySet()) {
-        dag.setAttribute(o.getOperator(), (Attribute)attr.getKey(), attr.getValue());
+    for (OperatorMeta o : this.dag.getAllOperators()) {
+      dag2.addOperator(o.getName(), o.getOperator());
+    }
+    for (StreamMeta s : this.dag.getAllStreams()) {
+      for (InputPortMeta i : s.getSinks()) {
+        Operator.OutputPort<Object> op = (OutputPort<Object>) s.getSource().getPortObject();
+        Operator.InputPort<Object> ip = (InputPort<Object>) i.getPortObject();
+        dag2.addStream(s.getName(), op, ip);
       }
     }
-    for(StreamMeta s: this.dag.getAllStreams()) {
-      if(loopStreams.contains(s)) {
+
+    detectLoops(dag2, conf);
+
+    // Reconstruct Dag
+    for (OperatorMeta o : this.dag.getAllOperators()) {
+      dag.addOperator(o.getName(), o.getOperator());
+      System.out.println("Added Operator: " + o.getName());
+      for (Entry<Attribute<?>, Object> attr : o.getAttributes().entrySet()) {
+        dag.setAttribute(o.getOperator(), (Attribute) attr.getKey(), attr.getValue());
+      }
+    }
+    for (StreamMeta s : this.dag.getAllStreams()) {
+      if (loopStreams.contains(s)) {
         // Add delay Operator
-        DefaultDelayOperator<ContentEvent> d = dag.addOperator("Delay" + s.getName(), new DefaultDelayOperator<ContentEvent>());
-        dag.addStream("Delay" + s.getName() + "toDelay", (DefaultOutputPort<ContentEvent>)s.getSource().getPortObject(), d.input);
-        dag.addStream("Delay" + s.getName() + "fromDelay", d.output, (DefaultInputPort<ContentEvent>)s.getSinks().get(0).getPortObject());
+        DefaultDelayOperator<ContentEvent> d = dag.addOperator("Delay" + s.getName(),
+            new DefaultDelayOperator<ContentEvent>());
+        dag.addStream("Delay" + s.getName() + "toDelay",
+            (DefaultOutputPort<ContentEvent>) s.getSource().getPortObject(), d.input);
+        dag.addStream("Delay" + s.getName() + "fromDelay", d.output,
+            (DefaultInputPort<ContentEvent>) s.getSinks().get(0).getPortObject());
         continue;
       }
-      for(InputPortMeta i: s.getSinks()) {
+      for (InputPortMeta i : s.getSinks()) {
         DefaultOutputPort<Object> op = (DefaultOutputPort<Object>) s.getSource().getPortObject();
         DefaultInputPort<Object> ip = (DefaultInputPort<Object>) i.getPortObject();
         Preconditions.checkArgument(op != null && ip != null);
@@ -109,50 +105,47 @@ public class ApexTask implements StreamingApplication {
       }
     }
 
-//    dag.setAttribute(DAGContext.STREAMING_WINDOW_SIZE_MILLIS, 100);
+    //    dag.setAttribute(DAGContext.STREAMING_WINDOW_SIZE_MILLIS, 100);
     System.out.println(dag.getAttributes());
     dag.setAttribute(Context.DAGContext.APPLICATION_NAME, appName);
-	}
+  }
 
-	public void detectLoops(DAG dag, Configuration conf) {
-	  List<OperatorMeta> inputOperators = Lists.newArrayList();
-	  for(OperatorMeta om : this.dag.getAllOperators()) {
-	    if(om.getOperator() instanceof InputOperator) {
-	      inputOperators.add(om);
-	    }
-	  }
-	
-	  for(OperatorMeta o: inputOperators) {
-	    visited.clear();
-	    List<OperatorMeta> visited = Lists.newArrayList();
-	    dfs(o, visited);
-	  }
-	}
+  public void detectLoops(DAG dag, Configuration conf) {
+    List<OperatorMeta> inputOperators = Lists.newArrayList();
+    for (OperatorMeta om : this.dag.getAllOperators()) {
+      if (om.getOperator() instanceof InputOperator) {
+        inputOperators.add(om);
+      }
+    }
 
-	public void dfs(OperatorMeta o, List<OperatorMeta> visited) {
+    for (OperatorMeta o : inputOperators) {
+      visited.clear();
+      List<OperatorMeta> visited = Lists.newArrayList();
+      dfs(o, visited);
+    }
+  }
+
+  public void dfs(OperatorMeta o, List<OperatorMeta> visited) {
     visited.add(o);
 
-    for(Entry<OutputPortMeta, StreamMeta>  opm: o.getOutputStreams().entrySet()) {
+    for (Entry<OutputPortMeta, StreamMeta> opm : o.getOutputStreams().entrySet()) {
       // Samoa won't allow one output port to multiple input port kind of streams
       OperatorMeta downStreamOp = opm.getValue().getSinks().get(0).getOperatorWrapper();
-      if(visited.contains(downStreamOp)) {
+      if (visited.contains(downStreamOp)) {
         loopStreams.add(opm.getValue());
-      }
-      else {
+      } else {
         List<OperatorMeta> v2 = Lists.newArrayList();
         v2.addAll(visited);
         dfs(downStreamOp, v2);
       }
     }
-	}
+  }
 
-  public void setLocalMode(boolean localMode)
-  {
+  public void setLocalMode(boolean localMode) {
     this.localMode = localMode;
   }
 
-  public boolean isLocalMode()
-  {
+  public boolean isLocalMode() {
     return localMode;
   }
 

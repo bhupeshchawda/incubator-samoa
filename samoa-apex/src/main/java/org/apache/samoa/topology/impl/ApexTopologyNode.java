@@ -20,12 +20,6 @@ package org.apache.samoa.topology.impl;
  * #L%
  */
 
-/**
- * Interface to represent a node in samoa-apex topology.
- * 
- * @author Arinto Murdopo
- * 
- */
 interface ApexTopologyNode {
 
   void addToTopology(ApexTopology topology, int parallelismHint);
