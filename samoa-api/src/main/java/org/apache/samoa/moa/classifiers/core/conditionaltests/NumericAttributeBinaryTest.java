@@ -39,7 +39,7 @@ public class NumericAttributeBinaryTest extends InstanceConditionalBinaryTest {
 
   protected boolean equalsPassesTest;
 
-  public NumericAttributeBinaryTest(){
+  public NumericAttributeBinaryTest() {
   }
 
   public NumericAttributeBinaryTest(int attIndex, double attValue,

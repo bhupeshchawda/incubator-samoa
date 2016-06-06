@@ -144,7 +144,6 @@ final class ActiveLearningNode extends LearningNode {
     ComputeContentEvent cce = new ComputeContentEvent(splitId, this.id,
         this.getObservedClassDistribution());
     modelAggrProc.sendToControlStream(cce);
-    System.out.println("Sent Control Event: " + cce.learningNodeId);
   }
 
   void addDistributedSuggestions(AttributeSplitSuggestion bestSuggestion, AttributeSplitSuggestion secondBestSuggestion) {

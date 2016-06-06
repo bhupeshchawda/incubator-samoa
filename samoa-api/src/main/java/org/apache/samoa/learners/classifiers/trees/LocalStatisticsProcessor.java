@@ -65,7 +65,7 @@ final class LocalStatisticsProcessor implements Processor {
   private final boolean binarySplit;
   private final AttributeClassObserver nominalClassObserver;
   private final AttributeClassObserver numericClassObserver;
-  private int i = 0;
+
   public LocalStatisticsProcessor()
   {
     splitCriterion = null;
@@ -73,6 +73,7 @@ final class LocalStatisticsProcessor implements Processor {
     nominalClassObserver = null;
     numericClassObserver = null;
   }
+
   // the two observer classes below are also needed to be setup from the Tree
   private LocalStatisticsProcessor(Builder builder) {
     this.splitCriterion = builder.splitCriterion;
@@ -158,7 +159,6 @@ final class LocalStatisticsProcessor implements Processor {
       LocalResultContentEvent lcre =
           new LocalResultContentEvent(cce.getSplitId(), bestSuggestion, secondBestSuggestion);
       computationResultStream.put(lcre);
-      System.out.println("Sent LocalResult: " + lcre.getBestSuggestion().merit);
       logger.debug("Finish compute event");
     } else if (event instanceof DeleteContentEvent) {
       DeleteContentEvent dce = (DeleteContentEvent) event;

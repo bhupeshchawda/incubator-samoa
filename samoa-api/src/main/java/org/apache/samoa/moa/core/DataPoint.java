@@ -37,9 +37,9 @@ public class DataPoint extends DenseInstance {
 
   protected int noiseLabel;
 
-  public DataPoint(){
-    
+  public DataPoint() {
   }
+
   public DataPoint(Instance nextInstance, Integer timestamp) {
     super(nextInstance);
     this.setDataset(nextInstance.dataset());

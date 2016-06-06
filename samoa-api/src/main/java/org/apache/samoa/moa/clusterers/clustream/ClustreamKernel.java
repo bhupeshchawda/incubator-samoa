@@ -36,9 +36,9 @@ public class ClustreamKernel extends CFCluster {
   int m;
   double t;
 
-  public ClustreamKernel(){
-    
+  public ClustreamKernel() {
   }
+
   public ClustreamKernel(Instance instance, int dimensions, long timestamp, double t, int m) {
     super(instance, dimensions);
     this.t = t;
