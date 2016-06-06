@@ -48,7 +48,7 @@ public class AlgosTestApex {
   }
 
   @Test(timeout = 120000)
-  public void testBaggingWithApex() throws Exception {
+  public void testNaiveBayesWithApex() throws Exception {
     TestParams baggingConfig = new TestParams.Builder()
         .inputInstances(200_000)
         .samplingSize(20_000)
@@ -57,7 +57,7 @@ public class AlgosTestApex {
         .classificationsCorrect(60f)
         .kappaStat(0f)
         .kappaTempStat(0f)
-        .cliStringTemplate(TestParams.Templates.PREQEVAL_BAGGING_RANDOMTREE)
+        .cliStringTemplate(TestParams.Templates.PREQEVAL_NAIVEBAYES_HYPERPLANE)
         .resultFilePollTimeout(40)
         .prePollWait(20)
         .taskClassName(LocalApexDoTask.class.getName())
@@ -65,5 +65,4 @@ public class AlgosTestApex {
     TestUtils.test(baggingConfig);
 
   }
-
 }
