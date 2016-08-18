@@ -43,7 +43,6 @@ public class ApexDoTask {
 
   public static void startLaunch() throws Exception {
     ApexTask streamingApp = new ApexTask(apexTopo);
-    streamingApp.setLocalMode(true);
     launch(streamingApp, "Apex App");
   }
 
@@ -52,6 +51,7 @@ public class ApexDoTask {
     conf.set("dt.loggers.level", "org.apache.*:DEBUG");
     conf.set("dt.dfsRootDirectory", System.getProperty("dt.dfsRootDirectory"));
     conf.set("fs.defaultFS", System.getProperty("fs.defaultFS"));
+    conf.set("yarn.resourcemanager.address", System.getProperty("yarn.resourcemanager.address"));
 
     conf.addResource(new Path(System.getProperty("dt.site.path")));
 

@@ -23,6 +23,8 @@ package org.apache.samoa.apex.topology.impl;
 import java.io.Serializable;
 import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.core.Processor;
+
+import com.datatorrent.api.Context;
 import com.datatorrent.api.Context.OperatorContext;
 import com.datatorrent.api.annotation.InputPortFieldAnnotation;
 import com.datatorrent.api.annotation.OutputPortFieldAnnotation;

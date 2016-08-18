@@ -56,7 +56,6 @@ public class ApexTask implements StreamingApplication {
   String appName = "SAMOA-Apex-Application";
   List<OperatorMeta> visited = Lists.newArrayList();
   Set<StreamMeta> loopStreams = Sets.newHashSet();
-  boolean localMode = false;
 
   public ApexTask(ApexTopology apexTopo) {
     this.dag = (LogicalPlan) apexTopo.getDAG();
@@ -93,6 +92,7 @@ public class ApexTask implements StreamingApplication {
           dag.setInputPortAttribute(meta.getPortObject(), (Attribute) entry.getKey(), entry.getValue());
         }
       }
+      dag.setAttribute(Context.OperatorContext.TIMEOUT_WINDOW_COUNT, 300);
     }
     for (StreamMeta s : this.dag.getAllStreams()) {
       if (loopStreams.contains(s)) {
@@ -147,14 +147,6 @@ public class ApexTask implements StreamingApplication {
         dfs(downStreamOp, v2);
       }
     }
-  }
-
-  public void setLocalMode(boolean localMode) {
-    this.localMode = localMode;
-  }
-
-  public boolean isLocalMode() {
-    return localMode;
   }
 
 }
