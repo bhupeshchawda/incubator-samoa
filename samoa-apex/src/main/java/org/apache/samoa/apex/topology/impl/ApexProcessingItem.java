@@ -20,13 +20,11 @@ package org.apache.samoa.apex.topology.impl;
  * #L%
  */
 
-import java.util.Random;
 import java.util.UUID;
 
 import com.datatorrent.api.Context;
 import com.datatorrent.api.DAG;
 import com.datatorrent.common.partitioner.StatelessPartitioner;
-import com.datatorrent.stram.codec.DefaultStatefulStreamCodec;
 
 import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.core.Processor;
@@ -98,8 +96,7 @@ public class ApexProcessingItem extends AbstractProcessingItem implements ApexTo
     this.dag = dag;
     this.operator.instances = parallelismHint;
     String fqcn = this.getName();
-    String[] components = fqcn.split("\\.");
-    dag.addOperator(components[components.length - 1], this.operator);
+    dag.addOperator(fqcn, this.operator);
   }
 
   @Override
@@ -112,32 +109,5 @@ public class ApexProcessingItem extends AbstractProcessingItem implements ApexTo
     StringBuilder sb = new StringBuilder(super.toString());
     sb.insert(0, String.format("id: %s, ", this.getName()));
     return sb.toString();
-  }
-
-  public static class RandomStreamCodec extends DefaultStatefulStreamCodec<ContentEvent> {
-    Random r;
-
-    public RandomStreamCodec() {
-      r = new Random();
-    }
-
-    @Override
-    public int getPartition(ContentEvent tuple) {
-      return r.nextInt();
-    }
-  }
-
-  public static class KeyBasedStreamCodec extends DefaultStatefulStreamCodec<ContentEvent> {
-    @Override
-    public int getPartition(ContentEvent tuple) {
-      return tuple.getKey().hashCode();
-    }
-  }
-
-  public static class AllStreamCodec extends DefaultStatefulStreamCodec<ContentEvent> {
-    @Override
-    public int getPartition(ContentEvent tuple) {
-      return tuple.getKey().hashCode();
-    }
   }
 }

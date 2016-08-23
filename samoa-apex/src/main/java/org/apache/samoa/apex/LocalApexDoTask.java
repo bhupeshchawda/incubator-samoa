@@ -35,6 +35,7 @@ import com.datatorrent.stram.plan.logical.LogicalPlan;
 
 public class LocalApexDoTask {
 
+  @SuppressWarnings("unused")
   private static final Logger logger = LoggerFactory.getLogger(LocalApexDoTask.class);
 
   public static void main(String[] args) {

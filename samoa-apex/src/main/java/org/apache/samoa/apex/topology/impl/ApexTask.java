@@ -39,7 +39,6 @@ import com.datatorrent.api.InputOperator;
 import com.datatorrent.api.Operator;
 import com.datatorrent.api.Operator.InputPort;
 import com.datatorrent.api.Operator.OutputPort;
-import com.datatorrent.common.util.DefaultDelayOperator;
 import com.datatorrent.api.StreamingApplication;
 import com.datatorrent.stram.plan.logical.LogicalPlan;
 import com.datatorrent.stram.plan.logical.LogicalPlan.InputPortMeta;
@@ -48,21 +47,23 @@ import com.datatorrent.stram.plan.logical.LogicalPlan.OutputPortMeta;
 import com.datatorrent.stram.plan.logical.LogicalPlan.StreamMeta;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class ApexTask implements StreamingApplication {
 
   LogicalPlan dag;
-  String appName = "SAMOA-Apex-Application";
+  String appName;
   List<OperatorMeta> visited = Lists.newArrayList();
   Set<StreamMeta> loopStreams = Sets.newHashSet();
+  Map<String, Integer> operatorNames = Maps.newHashMap();
 
   public ApexTask(ApexTopology apexTopo) {
     this.dag = (LogicalPlan) apexTopo.getDAG();
-    appName = apexTopo.getTopologyName();
+    appName = apexTopo.getTopologyName(); 
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   public void populateDAG(DAG dag, Configuration conf) {
 
@@ -82,7 +83,7 @@ public class ApexTask implements StreamingApplication {
 
     // Reconstruct Dag
     for (OperatorMeta o : this.dag.getAllOperators()) {
-      dag.addOperator(o.getName(), o.getOperator());
+      dag.addOperator(getCleanName(o.getName()), o.getOperator());
       for (Entry<Attribute<?>, Object> attr : o.getAttributes().entrySet()) {
         dag.setAttribute(o.getOperator(), (Attribute) attr.getKey(), attr.getValue());
       }
@@ -97,7 +98,7 @@ public class ApexTask implements StreamingApplication {
     for (StreamMeta s : this.dag.getAllStreams()) {
       if (loopStreams.contains(s)) {
         // Add delay Operator
-        DelayOperatorSerializable<ContentEvent> d = dag.addOperator("Delay" + s.getName(),
+        DelayOperatorSerializable<ContentEvent> d = dag.addOperator(getCleanName("Delay" + s.getName()),
             new DelayOperatorSerializable<ContentEvent>());
         dag.addStream("Delay" + s.getName() + "toDelay",
             (DefaultOutputPort<ContentEvent>) s.getSource().getPortObject(), d.input);
@@ -114,7 +115,6 @@ public class ApexTask implements StreamingApplication {
         dag.addStream(s.getName(), op, ip);
       }
     }
-
     dag.setAttribute(Context.DAGContext.APPLICATION_NAME, appName);
   }
 
@@ -149,4 +149,8 @@ public class ApexTask implements StreamingApplication {
     }
   }
 
+  public String getCleanName(String s) {
+    String[] names = s.split("\\.");
+    return names[names.length-1];
+  }
 }

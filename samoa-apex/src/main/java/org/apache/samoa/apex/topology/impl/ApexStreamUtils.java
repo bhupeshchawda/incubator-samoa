@@ -115,6 +115,8 @@ public class ApexStreamUtils {
 
   public static class JavaSerializationStreamCodec<T extends ContentEvent> extends DefaultKryoStreamCodec<T> {
 
+    private static final long serialVersionUID = -183071548840076388L;
+
     public JavaSerializationStreamCodec() {
      super();
      this.kryo.setDefaultSerializer(JavaSerializer.class);

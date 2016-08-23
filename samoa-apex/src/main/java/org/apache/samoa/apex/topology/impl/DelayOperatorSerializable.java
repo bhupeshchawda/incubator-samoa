@@ -28,11 +28,15 @@ import com.esotericsoftware.kryo.serializers.JavaSerializer;
 
 @DefaultSerializer(JavaSerializer.class)
 public class DelayOperatorSerializable<T> extends DefaultDelayOperator<T> implements Serializable {
-  
+
+  private static final long serialVersionUID = -2972537213450678368L;
+
   public final DefaultInputPortSerializable<T> input = new DefaultInputPortSerializable<T>() {
-    
-    @Override
-    public void process(T tuple) {
+
+  private static final long serialVersionUID = 6830919916828325819L;
+
+  @Override
+  public void process(T tuple) {
       processTuple(tuple);
     }
   };

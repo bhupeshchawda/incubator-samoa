@@ -285,6 +285,7 @@ final class ModelAggregatorProcessor implements Processor {
   private int numBatches = 0;
 
   private void processInstances(InstancesContentEvent instContentEvent) {
+    long start = System.currentTimeMillis();
     for (InstanceContent instContent : instContentEvent.getList()) {
       Instance inst = instContent.getInstance();
       boolean isTesting = instContent.isTesting();
@@ -316,6 +317,7 @@ final class ModelAggregatorProcessor implements Processor {
         }
       }
     }
+    logger.debug("processInstances: {}", (System.currentTimeMillis() - start));
   }
 
   private boolean correctlyClassifies(Instance inst, double[] prediction) {

@@ -388,7 +388,8 @@ elif [ $PLATFORM = 'APEX' ]; then
     echo "Deployable: " $DEPLOYABLE
 
     #LIB_PREFIX=/opt/cloudera/parcels/CDH/lib/
-    YARN_CLASSPATH=$LIB_PREFIX/hadoop/*:$LIB_PREFIX/hadoop-yarn/*:$LIB_PREFIX/hadoop-hdfs/*:/etc/hadoop/conf
+    #YARN_CLASSPATH=$LIB_PREFIX/hadoop/*:$LIB_PREFIX/hadoop-yarn/*:$LIB_PREFIX/hadoop-hdfs/*:/etc/hadoop/conf
+    #YARN_CLASSPATH=$LIB_PREFIX/hdfs/*:$LIB_PREFIX/yarn/*:$LIB_PREFIX/common/*:$LIB_PREFIX/../../etc/hadoop
 
     if [ "$MODE_ARG" = "cluster" ]; then
         CMD="java -cp .:$YARN_CLASSPATH:$DEPLOYABLE -D$DT_DFS_DIR_OPTION=$DT_DFS_DIR -D$DEFAULT_FS_OPTION=$DEFAULT_FS -D$DT_SITE_OPTION=$DT_SITE -D$RM_OPTION=$RM org.apache.samoa.apex.ApexDoTask ${OPTIONS}"

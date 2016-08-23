@@ -1,5 +1,7 @@
 package org.apache.samoa.apex;
 
+import java.io.File;
+
 /*
  * #%L
  * SAMOA
@@ -21,7 +23,6 @@ package org.apache.samoa.apex;
  */
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
 import org.apache.samoa.apex.topology.impl.ApexTask;
 import org.apache.samoa.apex.topology.impl.ApexTopology;
 
@@ -53,7 +54,7 @@ public class ApexDoTask {
     conf.set("fs.defaultFS", System.getProperty("fs.defaultFS"));
     conf.set("yarn.resourcemanager.address", System.getProperty("yarn.resourcemanager.address"));
 
-    conf.addResource(new Path(System.getProperty("dt.site.path")));
+    conf.addResource(new File(System.getProperty("dt.site.path")).toURI().toURL());
 
     if (libjars != null) {
       conf.set(StramAppLauncher.LIBJARS_CONF_KEY_NAME, libjars);

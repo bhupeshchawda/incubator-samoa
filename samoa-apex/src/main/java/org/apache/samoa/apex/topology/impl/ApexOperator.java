@@ -24,7 +24,6 @@ import java.io.Serializable;
 import org.apache.samoa.core.ContentEvent;
 import org.apache.samoa.core.Processor;
 
-import com.datatorrent.api.Context;
 import com.datatorrent.api.Context.OperatorContext;
 import com.datatorrent.api.annotation.InputPortFieldAnnotation;
 import com.datatorrent.api.annotation.OutputPortFieldAnnotation;
@@ -155,4 +154,5 @@ public class ApexOperator extends BaseOperator implements Serializable {
       throw new RuntimeException("Need more input ports for ApexOperator");
     }
   }
+
 }
